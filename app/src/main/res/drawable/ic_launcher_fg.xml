@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wit fototoestel met envelopje -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,40 h10 l4,-6 h12 l4,6 h10 a4,4 0 0 1 4,4 v26 a4,4 0 0 1 -4,4 h-40 a4,4 0 0 1 -4,-4 v-26 a4,4 0 0 1 4,-4 z" />
+    <path
+        android:fillColor="#1E6FD9"
+        android:pathData="M54,47 a10,10 0 1 0 0.01,0 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,51 a6,6 0 1 0 0.01,0 z" />
+</vector>
