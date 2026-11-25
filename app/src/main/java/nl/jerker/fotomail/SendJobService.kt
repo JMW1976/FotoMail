@@ -68,7 +68,7 @@ class SendJobService : JobService() {
                     s.lastStatus = "❌ Inloggen bij Gmail mislukt — controleer adres en app-wachtwoord."
                     return false
                 } catch (e: Exception) {
-                    s.lastStatus = "⚠️ Versturen mislukt (${e.javaClass.simpleName}: ${e.message}). " +
+                    s.lastStatus = "⚠️ Versturen mislukt (${e.fullMessage()}). " +
                         "Nieuwe poging volgt automatisch."
                     return false
                 }

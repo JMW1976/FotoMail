@@ -115,7 +115,7 @@ class SettingsActivity : Activity() {
             } catch (e: javax.mail.AuthenticationFailedException) {
                 "❌ Inloggen mislukt — controleer Gmail-adres en app-wachtwoord"
             } catch (e: Exception) {
-                "❌ Mislukt: ${e.javaClass.simpleName}: ${e.message}"
+                "❌ Mislukt: ${e.fullMessage()}"
             }
             runOnUiThread {
                 testBtn.isEnabled = true

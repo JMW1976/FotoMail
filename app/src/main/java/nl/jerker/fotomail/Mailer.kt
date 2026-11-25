@@ -3,6 +3,8 @@ package nl.jerker.fotomail
 import java.io.File
 import java.util.Date
 import java.util.Properties
+import javax.activation.CommandMap
+import javax.activation.MailcapCommandMap
 import javax.mail.Authenticator
 import javax.mail.Message
 import javax.mail.PasswordAuthentication
@@ -16,7 +18,22 @@ import javax.mail.internet.MimeMultipart
 /** Verstuurt mail via smtp.gmail.com (SSL, poort 465). Niet op de UI-thread aanroepen. */
 object Mailer {
 
+    /** Registreert de MIME-handlers expliciet; op Android vindt JavaMail ze anders niet. */
+    private val handlersRegistered by lazy {
+        val mc = CommandMap.getDefaultCommandMap() as MailcapCommandMap
+        mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain")
+        mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html")
+        mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml")
+        mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed; x-java-fallback-entry=true")
+        mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822")
+        CommandMap.setDefaultCommandMap(mc)
+        true
+    }
+
     fun send(s: Settings, attachment: File?, subject: String, body: String) {
+        // Achtergrondthreads hebben op Android geen bruikbare class loader voor JavaMail
+        Thread.currentThread().contextClassLoader = Mailer::class.java.classLoader
+        check(handlersRegistered)
         val props = Properties().apply {
             put("mail.smtp.host", "smtp.gmail.com")
             put("mail.smtp.port", "465")
@@ -49,6 +66,18 @@ object Mailer {
             })
         }
         msg.setContent(parts)
+        msg.saveChanges()
         Transport.send(msg)
     }
+}
+
+/** Volledige foutketen, zodat de melding in de app de echte oorzaak toont. */
+fun Throwable.fullMessage(): String {
+    val parts = mutableListOf<String>()
+    var t: Throwable? = this
+    while (t != null && parts.size < 4) {
+        parts += "${t.javaClass.simpleName}: ${t.message}"
+        t = (t as? javax.mail.MessagingException)?.nextException ?: t.cause
+    }
+    return parts.joinToString(" ← ")
 }

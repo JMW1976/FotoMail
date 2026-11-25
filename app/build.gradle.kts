@@ -11,8 +11,8 @@ android {
         applicationId = "nl.jerker.fotomail"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     buildTypes {
@@ -33,8 +33,7 @@ android {
         resources {
             excludes += setOf(
                 "META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/LICENSE.md",
-                "META-INF/NOTICE", "META-INF/NOTICE.txt", "META-INF/NOTICE.md",
-                "META-INF/mailcap", "META-INF/mimetypes.default"
+                "META-INF/NOTICE", "META-INF/NOTICE.txt", "META-INF/NOTICE.md"
             )
         }
     }
