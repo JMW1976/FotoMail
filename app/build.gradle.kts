@@ -15,9 +15,23 @@ android {
         versionName = "1.1"
     }
 
+    // Vaste sleutel, zodat elke nieuwe build als update over de vorige installeert
+    signingConfigs {
+        create("fotomail") {
+            storeFile = file("fotomail.keystore")
+            storePassword = "fotomail"
+            keyAlias = "fotomail"
+            keyPassword = "fotomail"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("fotomail")
+        }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("fotomail")
         }
     }
 
