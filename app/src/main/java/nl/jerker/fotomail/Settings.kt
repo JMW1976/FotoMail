@@ -60,7 +60,7 @@ class Settings(context: Context) {
         get() = sender.contains("@") && appPassword.isNotBlank() && recipient.contains("@")
 
     companion object {
-        const val DEFAULT_RECIPIENT = "j.wouters@allbrass.com"
-        const val DEFAULT_SENDER = "jerker.wouters@gmail.com"
+        const val DEFAULT_RECIPIENT = ""
+        const val DEFAULT_SENDER = ""
     }
 }

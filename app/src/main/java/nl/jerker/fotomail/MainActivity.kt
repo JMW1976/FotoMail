@@ -117,7 +117,7 @@ class MainActivity : Activity() {
                 .setPositiveButton("OK", null)
                 .show()
         } else if (savedInstanceState == null) {
-            if (!settings.isConfigured) openSettings()
+            if (!settings.isConfigured) startActivity(Intent(this, HelpActivity::class.java))
             else if (settings.autoCamera) startSeries()
         }
     }

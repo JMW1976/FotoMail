@@ -1,6 +1,6 @@
 # Photo to Mail
 
-Android-app: foto maken → wordt automatisch als bijlage gemaild naar **j.wouters@allbrass.com**, verstuurd via **jerker.wouters@gmail.com** (Gmail-SMTP).
+Android-app: foto maken → wordt automatisch als bijlage gemaild naar een zelf in te stellen adres, verstuurd via een eigen Gmail-account (Gmail-SMTP). Een handleiding voor het instellen staat in de app.
 
 ## Werking
 - App openen → camera opent direct (uit te zetten in Instellingen).
@@ -9,7 +9,7 @@ Android-app: foto maken → wordt automatisch als bijlage gemaild naar **j.woute
 - Elke foto = één mail, onderwerp `Foto 2026-11-24 07-30-12`.
 
 ## Eenmalig instellen
-1. Google-account jerker.wouters@gmail.com: zet **tweestapsverificatie** aan.
+1. Google-account van de afzender: zet **tweestapsverificatie** aan.
 2. Ga naar https://myaccount.google.com/apppasswords → maak een app-wachtwoord ("Foto Mail") → kopieer de 16 tekens.
 3. App → Instellingen → plak het app-wachtwoord → **Testmail versturen**.
 

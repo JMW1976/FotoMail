@@ -35,6 +35,11 @@
             android:label="Instellingen"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity
+            android:name=".HelpActivity"
+            android:exported="false"
+            android:label="Handleiding" />
+
         <service
             android:name=".SendJobService"
             android:exported="false"

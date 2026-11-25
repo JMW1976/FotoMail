@@ -39,10 +39,16 @@ class SettingsActivity : Activity() {
             setText(value); inputType = type; isSingleLine = true; setTextColor(Color.WHITE)
         }, top = 2) as EditText
 
-        label("Je Gmail-adres (afzender)", top = 0)
+        col.addRow(brandButton("Handleiding: Gmail instellen", ButtonStyle.BROWN, size = 14f) {
+            startActivity(Intent(this, HelpActivity::class.java))
+        }, top = 0)
+
+        label("Je Gmail-adres (afzender)", top = 24)
         sender = field(s.sender, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+        sender.hint = "naam@gmail.com"
         label("Gmail app-wachtwoord (16 tekens)")
         password = field(s.appPassword, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+        password.hint = "abcd efgh ijkl mnop"
         col.addRow(TextView(this).apply {
             textSize = 13f
             setTextColor(Brand.MUTED)
@@ -55,6 +61,7 @@ class SettingsActivity : Activity() {
 
         label("Versturen naar")
         recipient = field(s.recipient, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
+        recipient.hint = "bijv. je werkmail"
         label("Onderwerp begint met")
         prefix = field(s.subjectPrefix, InputType.TYPE_CLASS_TEXT)
 
