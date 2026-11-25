@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lijn-icoon camera (zwart, zonder vulling) voor de grote fotoknop -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="112dp"
+    android:height="112dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M2.5,7 H7 L8.8,4.5 H15.2 L17,7 H21.5 V19.5 H2.5 Z"
+        android:strokeColor="#111111"
+        android:strokeWidth="1.5"
+        android:strokeLineJoin="miter" />
+    <path
+        android:pathData="M12,9 a4,4 0 1 0 0.01,0 z"
+        android:strokeColor="#111111"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M18,9.5 h1.5"
+        android:strokeColor="#111111"
+        android:strokeWidth="1.5" />
+</vector>

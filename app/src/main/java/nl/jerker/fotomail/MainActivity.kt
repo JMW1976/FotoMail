@@ -26,7 +26,6 @@ import java.io.File
 class MainActivity : Activity() {
 
     private lateinit var settings: Settings
-    private lateinit var subtitle: TextView
     private lateinit var status: TextView
     private lateinit var retryBtn: Button
     private lateinit var sendCollectedBtn: Button
@@ -71,15 +70,13 @@ class MainActivity : Activity() {
             leftMargin = dp(16)
         })
 
-        subtitle = sectionLabel("")
 
         val col = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(24), dp(8), dp(24), dp(32))
         }
-        col.addRow(subtitle, top = 20)
-        col.addRow(brandButton("📷  Foto maken", ButtonStyle.PRIMARY, size = 26f) { startSeries() },
-            height = dp(170), top = 10)
+        col.addRow(brandIconButton(R.drawable.ic_camera_line, 112, "Foto maken") { startSeries() },
+            height = dp(170), top = 24)
         status = TextView(this).apply {
             textSize = 16f
             setTextColor(Color.WHITE)
@@ -238,7 +235,6 @@ class MainActivity : Activity() {
         val c = PhotoStore.collected(this)
         val cMb = c.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0
         val mails = PhotoStore.batches(c).size
-        subtitle.text = "FOTO'S NAAR ${settings.recipient.uppercase()}"
         status.text = buildString {
             if (!settings.isConfigured) append("⚠️ Vul eerst je Gmail-gegevens in bij Instellingen.\n\n")
             if (settings.currentSubject.isNotBlank()) append("Onderwerp: ${settings.currentSubject}\n")
