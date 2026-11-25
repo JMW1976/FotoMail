@@ -50,7 +50,7 @@ class SendJobService : JobService() {
         fun sendAll(ctx: Context): Boolean = synchronized(lock) {
             val s = Settings(ctx)
             if (!s.isConfigured) {
-                s.lastStatus = "Niet verstuurd: Gmail-gegevens ontbreken (Instellingen)."
+                s.setLast("config", "Gmail-gegevens ontbreken. Vul ze in bij Instellingen.")
                 return true
             }
             val time = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -82,14 +82,13 @@ class SendJobService : JobService() {
                         batch.forEach { PhotoStore.remove(it) }
                         sentPhotos += batch.size
                         sentMails++
-                        s.lastStatus = "✅ $sentPhotos foto${if (sentPhotos == 1) "" else "'s"} verstuurd " +
-                            "in $sentMails mail${if (sentMails == 1) "" else "s"} om ${time.format(Date())}"
+                        s.setLast("ok", "$sentPhotos foto${if (sentPhotos == 1) "" else "'s"}  ·  " +
+                            "$sentMails mail${if (sentMails == 1) "" else "s"}  ·  ${time.format(Date())}")
                     } catch (e: AuthenticationFailedException) {
-                        s.lastStatus = "❌ Inloggen bij Gmail mislukt — controleer adres en app-wachtwoord."
+                        s.setLast("auth", "Inloggen bij Gmail mislukt. Controleer adres en app-wachtwoord bij Instellingen.")
                         return false
                     } catch (e: Exception) {
-                        s.lastStatus = "⚠️ Versturen mislukt (${e.fullMessage()}). " +
-                            "Nieuwe poging volgt automatisch."
+                        s.setLast("error", "Nieuwe poging volgt automatisch.\n${e.fullMessage()}")
                         return false
                     }
                 }

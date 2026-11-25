@@ -26,7 +26,7 @@ import java.io.File
 class MainActivity : Activity() {
 
     private lateinit var settings: Settings
-    private lateinit var status: TextView
+    private lateinit var status: StatusPanel
     private lateinit var retryBtn: Button
     private lateinit var sendCollectedBtn: Button
     private var pendingName: String? = null
@@ -77,18 +77,13 @@ class MainActivity : Activity() {
         }
         col.addRow(brandIconButton(R.drawable.ic_camera_line, 112, "Foto maken") { startSeries() },
             height = dp(170), top = 24)
-        status = TextView(this).apply {
-            textSize = 16f
-            setTextColor(Color.WHITE)
-            setLineSpacing(0f, 1.2f)
+        status = StatusPanel(this).apply {
+            addRow("subject", "Onderwerp")
+            addRow("collected", "Verzameld")
+            addRow("queue", "Wachtrij")
+            addRow("last", "Laatste verzending")
         }
-        sendCollectedBtn = col.addRow(brandButton("Verstuur", ButtonStyle.BROWN, size = 18f) {
-            val n = PhotoStore.releaseCollected(applicationContext)
-            SendJobService.schedule(applicationContext)
-            toast("$n foto${if (n == 1) "" else "'s"} worden verstuurd")
-            refresh()
-        }, height = dp(72), top = 16) as Button
-        col.addRow(accentCard(status), top = 24)
+        col.addRow(status.view, top = 24)
         retryBtn = col.addRow(brandButton("Wachtrij nu versturen", ButtonStyle.BROWN) {
             SendJobService.schedule(applicationContext)
             toast("Verzenden gestart")
@@ -202,7 +197,7 @@ class MainActivity : Activity() {
             file.delete()
             return
         }
-        status.text = "Foto verwerken…"
+        status.setHeadline("Foto verwerken…", StatusPanel.Dot.BUSY)
         val keep = settings.keepOriginal
         val direct = settings.directSend
         val subject = settings.currentSubject
@@ -235,15 +230,28 @@ class MainActivity : Activity() {
         val c = PhotoStore.collected(this)
         val cMb = c.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0
         val mails = PhotoStore.batches(c).size
-        status.text = buildString {
-            if (!settings.isConfigured) append("⚠️ Vul eerst je Gmail-gegevens in bij Instellingen.\n\n")
-            if (settings.currentSubject.isNotBlank()) append("Onderwerp: ${settings.currentSubject}\n")
-            if (c.isNotEmpty()) append("Verzameld: ${c.size} foto${if (c.size == 1) "" else "'s"} " +
-                "(± ${"%.1f".format(cMb)} MB → $mails mail${if (mails == 1) "" else "s"})\n")
-            append(if (n == 0) "Wachtrij leeg — alles is verstuurd." else "In wachtrij: $n foto${if (n == 1) "" else "'s"}")
-            val last = settings.lastStatus
-            if (last.isNotBlank()) append("\n\nLaatste melding:\n$last")
+        fun foto(k: Int) = "$k foto${if (k == 1) "" else "'s"}"
+        val state = settings.lastState
+        val failed = n > 0 && (state == "error" || state == "auth")
+        when {
+            !settings.isConfigured -> status.setHeadline("Instellingen onvolledig", StatusPanel.Dot.ERROR)
+            failed -> status.setHeadline("Verzenden mislukt", StatusPanel.Dot.ERROR)
+            n > 0 -> status.setHeadline("Bezig met versturen", StatusPanel.Dot.BUSY)
+            c.isNotEmpty() -> status.setHeadline("${foto(c.size)} klaar om te versturen", StatusPanel.Dot.BUSY)
+            state == "ok" -> status.setHeadline("Alles verstuurd", StatusPanel.Dot.OK)
+            else -> status.setHeadline("Klaar voor gebruik", StatusPanel.Dot.IDLE)
         }
+        status.setRow("subject", settings.currentSubject.ifBlank { null })
+        status.setRow("collected", if (c.isEmpty()) null
+            else "${foto(c.size)}  ·  ${"%.1f".format(cMb)} MB  ·  $mails mail${if (mails == 1) "" else "s"}")
+        status.setRow("queue", if (n == 0) null else "${foto(n)} nog te versturen")
+        val lastText = when (state) {
+            "ok" -> settings.lastDetail
+            "auth", "error", "config" -> if (failed || state == "config") settings.lastDetail else null
+            else -> null
+        }
+        val lastColor = if (state == "ok") Color.WHITE else Color.rgb(240, 150, 135)
+        status.setRow("last", lastText, lastColor)
         retryBtn.visibility = if (n > 0) View.VISIBLE else View.GONE
         sendCollectedBtn.visibility = if (c.isNotEmpty()) View.VISIBLE else View.GONE
         sendCollectedBtn.text = "Verstuur ${c.size} foto${if (c.size == 1) "" else "'s"}"

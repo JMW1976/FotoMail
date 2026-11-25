@@ -43,9 +43,18 @@ class Settings(context: Context) {
         get() = p.getString("currentSubject", "") ?: ""
         set(v) = p.edit().putString("currentSubject", v.trim()).apply()
 
-    var lastStatus: String
-        get() = p.getString("lastStatus", "") ?: ""
-        set(v) = p.edit().putString("lastStatus", v).apply()
+    /** Resultaat van de laatste verzendpoging: "", "ok", "auth", "error" of "config". */
+    var lastState: String
+        get() = p.getString("lastState", "") ?: ""
+        set(v) = p.edit().putString("lastState", v).apply()
+
+    var lastDetail: String
+        get() = p.getString("lastDetail", "") ?: ""
+        set(v) = p.edit().putString("lastDetail", v).apply()
+
+    fun setLast(state: String, detail: String) {
+        p.edit().putString("lastState", state).putString("lastDetail", detail).apply()
+    }
 
     val isConfigured: Boolean
         get() = sender.contains("@") && appPassword.isNotBlank() && recipient.contains("@")
