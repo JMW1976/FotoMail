@@ -1,6 +1,7 @@
 package nl.jerker.fotomail
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
@@ -11,6 +12,10 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -73,7 +78,7 @@ class MainActivity : Activity() {
             setPadding(dp(24), dp(8), dp(24), dp(32))
         }
         col.addRow(subtitle, top = 20)
-        col.addRow(brandButton("📷  Foto maken", ButtonStyle.PRIMARY, size = 26f) { launchCamera() },
+        col.addRow(brandButton("📷  Foto maken", ButtonStyle.PRIMARY, size = 26f) { startSeries() },
             height = dp(170), top = 10)
         status = TextView(this).apply {
             textSize = 16f
@@ -108,7 +113,7 @@ class MainActivity : Activity() {
 
         if (savedInstanceState == null) {
             if (!settings.isConfigured) openSettings()
-            else if (settings.autoCamera) launchCamera()
+            else if (settings.autoCamera) startSeries()
         }
     }
 
@@ -128,6 +133,43 @@ class MainActivity : Activity() {
     }
 
     private fun openSettings() = startActivity(Intent(this, SettingsActivity::class.java))
+
+    /** Vraagt het onderwerp van de fotoreeks en start daarna de camera. */
+    private fun startSeries() {
+        if (!settings.isConfigured) {
+            toast("Stel eerst je Gmail-gegevens in")
+            openSettings()
+            return
+        }
+        val input = EditText(this).apply {
+            setText(settings.currentSubject)
+            hint = "Bijv. Pers 3 – matrijsschade"
+            isSingleLine = true
+            imeOptions = EditorInfo.IME_ACTION_GO
+            setTextColor(Color.WHITE)
+            selectAll()
+        }
+        val box = FrameLayout(this).apply {
+            setPadding(dp(24), dp(8), dp(24), 0)
+            addView(input)
+        }
+        val dialog = AlertDialog.Builder(this, R.style.AppDialog)
+            .setTitle("Onderwerp fotoreeks")
+            .setMessage("Wordt het onderwerp van de mail. Leeg laten mag.")
+            .setView(box)
+            .setPositiveButton("Start") { _, _ ->
+                settings.currentSubject = input.text.toString()
+                launchCamera()
+            }
+            .setNegativeButton("Annuleren", null)
+            .create()
+        input.setOnEditorActionListener { _, _, _ ->
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); true
+        }
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        dialog.show()
+        input.requestFocus()
+    }
 
     private fun launchCamera() {
         if (!settings.isConfigured) {
@@ -166,21 +208,25 @@ class MainActivity : Activity() {
         status.text = "Foto verwerken…"
         val keep = settings.keepOriginal
         val direct = settings.directSend
+        val subject = settings.currentSubject
         val app = applicationContext
         Thread {
             try {
-                PhotoStore.enqueue(app, file, keep, collect = !direct)
+                PhotoStore.enqueue(app, file, keep, collect = !direct, subject = subject)
                 if (direct) {
                     SendJobService.schedule(app)
-                    runOnUiThread { toast("Foto wordt verstuurd naar ${settings.recipient}"); refresh() }
+                    runOnUiThread {
+                        toast("Foto wordt verstuurd — maak de volgende of ga terug om te stoppen")
+                        refresh()
+                    }
                 } else {
                     val n = PhotoStore.collected(app).size
                     runOnUiThread {
                         toast("Foto $n verzameld — maak de volgende of ga terug om te versturen")
                         refresh()
-                        launchCamera() // direct door naar de volgende foto
                     }
                 }
+                runOnUiThread { launchCamera() } // reeks: direct door naar de volgende foto
             } catch (e: Exception) {
                 runOnUiThread { toast("Verwerken mislukt: ${e.message}") }
             }
@@ -195,6 +241,7 @@ class MainActivity : Activity() {
         subtitle.text = "FOTO'S NAAR ${settings.recipient.uppercase()}"
         status.text = buildString {
             if (!settings.isConfigured) append("⚠️ Vul eerst je Gmail-gegevens in bij Instellingen.\n\n")
+            if (settings.currentSubject.isNotBlank()) append("Onderwerp: ${settings.currentSubject}\n")
             if (c.isNotEmpty()) append("Verzameld: ${c.size} foto${if (c.size == 1) "" else "'s"} " +
                 "(± ${"%.1f".format(cMb)} MB → $mails mail${if (mails == 1) "" else "s"})\n")
             append(if (n == 0) "Wachtrij leeg — alles is verstuurd." else "In wachtrij: $n foto${if (n == 1) "" else "'s"}")

@@ -42,9 +42,33 @@ object PhotoStore {
         files.forEach { f ->
             val dst = File(queueDir(ctx), f.name)
             if (!f.renameTo(dst)) { f.copyTo(dst, overwrite = true); f.delete() }
+            val side = sidecar(f)
+            if (side.exists()) {
+                val sDst = sidecar(dst)
+                if (!side.renameTo(sDst)) { side.copyTo(sDst, overwrite = true); side.delete() }
+            }
         }
         return files.size
     }
+
+    /** Onderwerp-bestandje naast elke foto. */
+    private fun sidecar(f: File) = File(f.path + ".txt")
+
+    fun subjectOf(f: File): String = sidecar(f).let { if (it.exists()) it.readText().trim() else "" }
+
+    /** Foto (en bijbehorend onderwerp) verwijderen. */
+    fun remove(f: File) {
+        f.delete()
+        sidecar(f).delete()
+    }
+
+    /** Groepeert per onderwerp (volgorde blijft behouden) en splitst elke groep in mails van max. 15 MB. */
+    fun mailGroups(files: List<File>): List<Pair<String, List<List<File>>>> =
+        files.groupBy { subjectOf(it) }.map { (subject, list) -> subject to batches(list) }
+
+    /** Veilige bestandsnaam op basis van het onderwerp. */
+    fun safeName(subject: String): String =
+        subject.replace(Regex("[^A-Za-z0-9À-ÿ._ -]"), "").trim().replace(Regex("\\s+"), "_").take(60)
 
     /** Geschatte mailgrootte van een bijlage (base64 = 4/3 x zo groot + kopregels). */
     fun mailSize(f: File) = f.length() * 4 / 3 + 2_000
@@ -71,26 +95,27 @@ object PhotoStore {
     }
 
     /** Zet een gemaakte foto in de wachtrij (eventueel verkleind en rechtgezet). */
-    fun enqueue(ctx: Context, src: File, keepOriginal: Boolean, collect: Boolean = false): File {
+    fun enqueue(ctx: Context, src: File, keepOriginal: Boolean, collect: Boolean = false, subject: String = ""): File {
         val dst = uniqueFile(ctx)
-        if (collect) {
-            val target = File(collectDir(ctx), dst.name)
-            store(src, target, keepOriginal)
-            return target
-        }
-        store(src, dst, keepOriginal)
-        return dst
+        val target = if (collect) File(collectDir(ctx), dst.name) else dst
+        // Eerst het onderwerp wegschrijven, dan pas de foto: de verzender ziet zo nooit een foto zonder onderwerp
+        if (subject.isNotBlank()) sidecar(target).writeText(subject)
+        store(src, target, keepOriginal)
+        return target
     }
 
+    /** Schrijft eerst naar een tijdelijk bestand, zodat de verzender nooit een half bestand oppakt. */
     private fun store(src: File, dst: File, keepOriginal: Boolean) {
-        if (keepOriginal || !shrink(src, dst)) {
-            if (!src.renameTo(dst)) {
-                src.copyTo(dst, overwrite = true)
+        val tmp = File(dst.path + ".tmp")
+        if (keepOriginal || !shrink(src, tmp)) {
+            if (!src.renameTo(tmp)) {
+                src.copyTo(tmp, overwrite = true)
                 src.delete()
             }
         } else {
             src.delete()
         }
+        if (!tmp.renameTo(dst)) { tmp.copyTo(dst, overwrite = true); tmp.delete() }
     }
 
     private fun uniqueFile(ctx: Context): File {

@@ -38,6 +38,11 @@ class Settings(context: Context) {
         get() = p.getBoolean("directSend", true)
         set(v) = p.edit().putBoolean("directSend", v).apply()
 
+    /** Onderwerp van de huidige/laatste fotoreeks. */
+    var currentSubject: String
+        get() = p.getString("currentSubject", "") ?: ""
+        set(v) = p.edit().putString("currentSubject", v.trim()).apply()
+
     var lastStatus: String
         get() = p.getString("lastStatus", "") ?: ""
         set(v) = p.edit().putString("lastStatus", v).apply()

@@ -54,33 +54,44 @@ class SendJobService : JobService() {
                 return true
             }
             val time = SimpleDateFormat("HH:mm", Locale.getDefault())
-            val batches = PhotoStore.batches(PhotoStore.queued(ctx))
             fun pretty(f: java.io.File) = f.nameWithoutExtension.removePrefix("Foto_").replace('_', ' ')
             var sentPhotos = 0
-            batches.forEachIndexed { i, batch ->
-                val first = pretty(batch.first())
-                val part = if (batches.size > 1) " – deel ${i + 1}/${batches.size}" else ""
-                val subject = if (batch.size == 1) "${s.subjectPrefix} $first$part"
-                              else "${s.subjectPrefix} $first (${batch.size} foto's)$part"
-                val mb = "%.1f".format(Locale.US, batch.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0)
-                val body = buildString {
-                    append(if (batch.size == 1) "Foto gemaakt op $first." else "${batch.size} foto's:\n")
-                    if (batch.size > 1) batch.forEach { append("• ${pretty(it)}\n") }
-                    append("\nOngeveer $mb MB, verstuurd met Foto to Mail.")
-                }
-                try {
-                    Mailer.send(s, batch, subject.trim(), body)
-                    batch.forEach { it.delete() }
-                    sentPhotos += batch.size
-                    s.lastStatus = "✅ $sentPhotos foto${if (sentPhotos == 1) "" else "'s"} verstuurd " +
-                        "in ${i + 1} mail${if (i == 0) "" else "s"} om ${time.format(Date())}"
-                } catch (e: AuthenticationFailedException) {
-                    s.lastStatus = "❌ Inloggen bij Gmail mislukt — controleer adres en app-wachtwoord."
-                    return false
-                } catch (e: Exception) {
-                    s.lastStatus = "⚠️ Versturen mislukt (${e.fullMessage()}). " +
-                        "Nieuwe poging volgt automatisch."
-                    return false
+            var sentMails = 0
+            for ((subject, batches) in PhotoStore.mailGroups(PhotoStore.queued(ctx))) {
+                val base = PhotoStore.safeName(subject)
+                var counter = 0
+                batches.forEachIndexed { i, batch ->
+                    val first = pretty(batch.first())
+                    val part = if (batches.size > 1) " – deel ${i + 1}/${batches.size}" else ""
+                    val count = if (batch.size == 1) "" else " (${batch.size} foto's)"
+                    val mailSubject = if (subject.isNotBlank()) "$subject$count$part"
+                                      else "${s.subjectPrefix} $first$count$part".trim()
+                    val names = batch.map { f ->
+                        counter++
+                        if (base.isNotEmpty()) "${base}_%02d.jpg".format(counter) else f.name
+                    }
+                    val mb = "%.1f".format(Locale.US, batch.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0)
+                    val body = buildString {
+                        if (subject.isNotBlank()) append("Onderwerp: $subject\n\n")
+                        append(if (batch.size == 1) "Foto gemaakt op $first.\n" else "${batch.size} foto's:\n")
+                        if (batch.size > 1) batch.forEachIndexed { j, f -> append("• ${names[j]} — ${pretty(f)}\n") }
+                        append("\nOngeveer $mb MB, verstuurd met Foto to Mail.")
+                    }
+                    try {
+                        Mailer.send(s, batch, mailSubject, body, names)
+                        batch.forEach { PhotoStore.remove(it) }
+                        sentPhotos += batch.size
+                        sentMails++
+                        s.lastStatus = "✅ $sentPhotos foto${if (sentPhotos == 1) "" else "'s"} verstuurd " +
+                            "in $sentMails mail${if (sentMails == 1) "" else "s"} om ${time.format(Date())}"
+                    } catch (e: AuthenticationFailedException) {
+                        s.lastStatus = "❌ Inloggen bij Gmail mislukt — controleer adres en app-wachtwoord."
+                        return false
+                    } catch (e: Exception) {
+                        s.lastStatus = "⚠️ Versturen mislukt (${e.fullMessage()}). " +
+                            "Nieuwe poging volgt automatisch."
+                        return false
+                    }
                 }
             }
             true
