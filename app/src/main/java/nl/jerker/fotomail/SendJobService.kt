@@ -75,7 +75,7 @@ class SendJobService : JobService() {
                         if (subject.isNotBlank()) append("Onderwerp: $subject\n\n")
                         append(if (batch.size == 1) "Foto gemaakt op $first.\n" else "${batch.size} foto's:\n")
                         if (batch.size > 1) batch.forEachIndexed { j, f -> append("• ${names[j]} — ${pretty(f)}\n") }
-                        append("\nOngeveer $mb MB, verstuurd met Foto to Mail.")
+                        append("\nOngeveer $mb MB, verstuurd met Photo to Mail.")
                     }
                     try {
                         Mailer.send(s, batch, mailSubject, body, names)

@@ -58,7 +58,7 @@ class MainActivity : Activity() {
             setImageResource(R.drawable.app_logo)
             adjustViewBounds = true
             scaleType = ImageView.ScaleType.FIT_CENTER
-            contentDescription = "Foto to Mail"
+            contentDescription = "Photo to Mail"
         }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(48)))
         header.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
         header.addView(ImageView(this).apply {

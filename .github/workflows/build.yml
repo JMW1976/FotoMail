@@ -33,5 +33,5 @@ jobs:
         run: |
           gh release delete latest --yes --cleanup-tag || true
           gh release create latest FotoMail.apk \
-            --title "Foto Mail (laatste versie)" \
+            --title "Photo to Mail (laatste versie)" \
             --notes "Automatisch gebouwd vanaf commit ${GITHUB_SHA::7}. Download FotoMail.apk op je telefoon en installeer."
