@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- App-logo voor in de kop: icoon zonder achtergrond, strak bijgesneden -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="56dp"
+    android:height="45dp"
+    android:viewportWidth="56"
+    android:viewportHeight="45">
+    <group android:translateX="-27" android:translateY="-32">
+        <path android:fillColor="#FCDD17" android:pathData="M28,37 h9 l3,-5 h12 l3,5 h9 v26 h-36 z" />
+        <path android:fillColor="#000000" android:pathData="M46,41 a9,9 0 1 0 0.01,0 z" />
+        <path android:fillColor="#FCDD17" android:pathData="M46,45 a5,5 0 1 0 0.01,0 z" />
+        <path android:fillColor="#000000" android:pathData="M51,53 h31 v24 h-31 z" />
+        <path android:fillColor="#FFFFFF" android:pathData="M54,56 h25 v18 h-25 z" />
+        <path
+            android:pathData="M54,56.5 L66.5,66 L79,56.5"
+            android:strokeColor="#000000"
+            android:strokeWidth="2.6"
+            android:strokeLineJoin="miter" />
+    </group>
+</vector>

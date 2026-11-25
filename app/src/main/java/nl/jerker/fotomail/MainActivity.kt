@@ -24,6 +24,7 @@ class MainActivity : Activity() {
     private lateinit var subtitle: TextView
     private lateinit var status: TextView
     private lateinit var retryBtn: Button
+    private lateinit var sendCollectedBtn: Button
     private var pendingName: String? = null
 
     private val handler = Handler(Looper.getMainLooper())
@@ -42,7 +43,7 @@ class MainActivity : Activity() {
 
         actionBar?.hide()
 
-        // Kopbalk: alleen het Allbrass-logo op zwart
+        // Kopbalk: app-logo links, Allbrass-logo rechts, op zwart
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
@@ -50,11 +51,20 @@ class MainActivity : Activity() {
             setPadding(dp(24), dp(20), dp(24), dp(20))
         }
         header.addView(ImageView(this).apply {
+            setImageResource(R.drawable.app_logo)
+            adjustViewBounds = true
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            contentDescription = "Foto to Mail"
+        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(48)))
+        header.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
+        header.addView(ImageView(this).apply {
             setImageResource(R.drawable.allbrass_logo)
             adjustViewBounds = true
-            scaleType = ImageView.ScaleType.FIT_START
+            scaleType = ImageView.ScaleType.FIT_END
             contentDescription = "Allbrass"
-        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(64)))
+        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(56)).apply {
+            leftMargin = dp(16)
+        })
 
         subtitle = sectionLabel("")
 
@@ -70,6 +80,12 @@ class MainActivity : Activity() {
             setTextColor(Color.WHITE)
             setLineSpacing(0f, 1.2f)
         }
+        sendCollectedBtn = col.addRow(brandButton("Verstuur", ButtonStyle.BROWN, size = 18f) {
+            val n = PhotoStore.releaseCollected(applicationContext)
+            SendJobService.schedule(applicationContext)
+            toast("$n foto${if (n == 1) "" else "'s"} worden verstuurd")
+            refresh()
+        }, height = dp(72), top = 16) as Button
         col.addRow(accentCard(status), top = 24)
         retryBtn = col.addRow(brandButton("Wachtrij nu versturen", ButtonStyle.BROWN) {
             SendJobService.schedule(applicationContext)
@@ -149,12 +165,22 @@ class MainActivity : Activity() {
         }
         status.text = "Foto verwerken…"
         val keep = settings.keepOriginal
+        val direct = settings.directSend
         val app = applicationContext
         Thread {
             try {
-                PhotoStore.enqueue(app, file, keep)
-                SendJobService.schedule(app)
-                runOnUiThread { toast("Foto wordt verstuurd naar ${settings.recipient}"); refresh() }
+                PhotoStore.enqueue(app, file, keep, collect = !direct)
+                if (direct) {
+                    SendJobService.schedule(app)
+                    runOnUiThread { toast("Foto wordt verstuurd naar ${settings.recipient}"); refresh() }
+                } else {
+                    val n = PhotoStore.collected(app).size
+                    runOnUiThread {
+                        toast("Foto $n verzameld — maak de volgende of ga terug om te versturen")
+                        refresh()
+                        launchCamera() // direct door naar de volgende foto
+                    }
+                }
             } catch (e: Exception) {
                 runOnUiThread { toast("Verwerken mislukt: ${e.message}") }
             }
@@ -163,14 +189,21 @@ class MainActivity : Activity() {
 
     private fun refresh() {
         val n = PhotoStore.queued(this).size
+        val c = PhotoStore.collected(this)
+        val cMb = c.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0
+        val mails = PhotoStore.batches(c).size
         subtitle.text = "FOTO'S NAAR ${settings.recipient.uppercase()}"
         status.text = buildString {
             if (!settings.isConfigured) append("⚠️ Vul eerst je Gmail-gegevens in bij Instellingen.\n\n")
+            if (c.isNotEmpty()) append("Verzameld: ${c.size} foto${if (c.size == 1) "" else "'s"} " +
+                "(± ${"%.1f".format(cMb)} MB → $mails mail${if (mails == 1) "" else "s"})\n")
             append(if (n == 0) "Wachtrij leeg — alles is verstuurd." else "In wachtrij: $n foto${if (n == 1) "" else "'s"}")
             val last = settings.lastStatus
             if (last.isNotBlank()) append("\n\nLaatste melding:\n$last")
         }
         retryBtn.visibility = if (n > 0) View.VISIBLE else View.GONE
+        sendCollectedBtn.visibility = if (c.isNotEmpty()) View.VISIBLE else View.GONE
+        sendCollectedBtn.text = "Verstuur ${c.size} foto${if (c.size == 1) "" else "'s"}"
     }
 
     companion object {

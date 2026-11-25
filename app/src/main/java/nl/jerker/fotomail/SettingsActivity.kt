@@ -22,6 +22,7 @@ class SettingsActivity : Activity() {
     private lateinit var prefix: EditText
     private lateinit var keepOriginal: CheckBox
     private lateinit var autoCamera: CheckBox
+    private lateinit var directSend: CheckBox
     private lateinit var testBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +68,11 @@ class SettingsActivity : Activity() {
             isChecked = s.autoCamera
             setTextColor(Color.WHITE)
         }, top = 4) as CheckBox
+        directSend = col.addRow(CheckBox(this).apply {
+            text = "Elke foto direct versturen (uit = foto's verzamelen en samen versturen, max. 15 MB per mail)"
+            isChecked = s.directSend
+            setTextColor(Color.WHITE)
+        }, top = 4) as CheckBox
 
         col.addRow(brandButton("Opslaan", ButtonStyle.PRIMARY) { if (save()) finish() }, top = 28)
         testBtn = col.addRow(brandButton("Testmail versturen", ButtonStyle.BROWN) { sendTest() }, top = 12) as Button
@@ -96,6 +102,7 @@ class SettingsActivity : Activity() {
         s.subjectPrefix = prefix.text.toString()
         s.keepOriginal = keepOriginal.isChecked
         s.autoCamera = autoCamera.isChecked
+        s.directSend = directSend.isChecked
         // Staan er nog foto's te wachten, probeer ze dan nu te versturen
         if (PhotoStore.queued(this).isNotEmpty()) SendJobService.schedule(applicationContext)
         toast("Opgeslagen")
@@ -108,7 +115,7 @@ class SettingsActivity : Activity() {
         testBtn.text = "Bezig met versturen…"
         Thread {
             val result = try {
-                Mailer.send(s, null, "Foto to Mail – testbericht", "Het werkt! Foto's worden voortaan naar dit adres gestuurd.")
+                Mailer.send(s, emptyList(), "Foto to Mail – testbericht", "Het werkt! Foto's worden voortaan naar dit adres gestuurd.")
                 "✅ Testmail verstuurd naar ${s.recipient}"
             } catch (e: javax.mail.AuthenticationFailedException) {
                 "❌ Inloggen mislukt — controleer Gmail-adres en app-wachtwoord"

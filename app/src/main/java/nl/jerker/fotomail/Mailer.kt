@@ -30,7 +30,7 @@ object Mailer {
         true
     }
 
-    fun send(s: Settings, attachment: File?, subject: String, body: String) {
+    fun send(s: Settings, attachments: List<File>, subject: String, body: String) {
         // Achtergrondthreads hebben op Android geen bruikbare class loader voor JavaMail
         Thread.currentThread().contextClassLoader = Mailer::class.java.classLoader
         check(handlersRegistered)
@@ -59,10 +59,10 @@ object Mailer {
 
         val parts = MimeMultipart()
         parts.addBodyPart(MimeBodyPart().apply { setText(body, "UTF-8") })
-        if (attachment != null) {
+        for (f in attachments) {
             parts.addBodyPart(MimeBodyPart().apply {
-                attachFile(attachment, "image/jpeg", "base64")
-                fileName = attachment.name
+                attachFile(f, "image/jpeg", "base64")
+                fileName = f.name
             })
         }
         msg.setContent(parts)

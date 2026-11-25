@@ -33,6 +33,11 @@ class Settings(context: Context) {
         get() = p.getBoolean("autoCamera", true)
         set(v) = p.edit().putBoolean("autoCamera", v).apply()
 
+    /** true = elke foto meteen versturen; false = verzamelen en met één knop samen versturen. */
+    var directSend: Boolean
+        get() = p.getBoolean("directSend", true)
+        set(v) = p.edit().putBoolean("directSend", v).apply()
+
     var lastStatus: String
         get() = p.getString("lastStatus", "") ?: ""
         set(v) = p.edit().putString("lastStatus", v).apply()

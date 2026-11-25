@@ -21,13 +21,49 @@ object PhotoStore {
 
     fun captureDir(ctx: Context) = File(ctx.filesDir, "capture").apply { mkdirs() }
     fun queueDir(ctx: Context) = File(ctx.filesDir, "queue").apply { mkdirs() }
+    fun collectDir(ctx: Context) = File(ctx.filesDir, "collect").apply { mkdirs() }
+
+    /** Max. grootte van één mail (incl. base64-codering van de bijlagen). */
+    const val MAX_MAIL_BYTES = 15_000_000L
+    private const val MAIL_OVERHEAD = 50_000L
 
     fun newCaptureFile(ctx: Context): File =
         File(captureDir(ctx), "capture_${System.currentTimeMillis()}.jpg")
 
-    fun queued(ctx: Context): List<File> =
-        queueDir(ctx).listFiles { f -> f.isFile && f.name.endsWith(".jpg") }
-            ?.sortedBy { it.name } ?: emptyList()
+    fun queued(ctx: Context): List<File> = jpgs(queueDir(ctx))
+    fun collected(ctx: Context): List<File> = jpgs(collectDir(ctx))
+
+    private fun jpgs(dir: File): List<File> =
+        dir.listFiles { f -> f.isFile && f.name.endsWith(".jpg") }?.sortedBy { it.name } ?: emptyList()
+
+    /** Verzamelde foto's naar de verzendwachtrij verplaatsen. */
+    fun releaseCollected(ctx: Context): Int {
+        val files = collected(ctx)
+        files.forEach { f ->
+            val dst = File(queueDir(ctx), f.name)
+            if (!f.renameTo(dst)) { f.copyTo(dst, overwrite = true); f.delete() }
+        }
+        return files.size
+    }
+
+    /** Geschatte mailgrootte van een bijlage (base64 = 4/3 x zo groot + kopregels). */
+    fun mailSize(f: File) = f.length() * 4 / 3 + 2_000
+
+    /** Verdeelt foto's over mails van max. [MAX_MAIL_BYTES]. Een te grote losse foto gaat alleen. */
+    fun batches(files: List<File>): List<List<File>> {
+        val out = mutableListOf<List<File>>()
+        var cur = mutableListOf<File>()
+        var size = MAIL_OVERHEAD
+        for (f in files) {
+            val s = mailSize(f)
+            if (cur.isNotEmpty() && size + s > MAX_MAIL_BYTES) {
+                out += cur; cur = mutableListOf(); size = MAIL_OVERHEAD
+            }
+            cur += f; size += s
+        }
+        if (cur.isNotEmpty()) out += cur
+        return out
+    }
 
     /** Verwijdert achtergebleven camerabestanden, behalve [keep]. */
     fun cleanCaptures(ctx: Context, keep: String?) {
@@ -35,8 +71,18 @@ object PhotoStore {
     }
 
     /** Zet een gemaakte foto in de wachtrij (eventueel verkleind en rechtgezet). */
-    fun enqueue(ctx: Context, src: File, keepOriginal: Boolean): File {
-        val dst = uniqueQueueFile(ctx)
+    fun enqueue(ctx: Context, src: File, keepOriginal: Boolean, collect: Boolean = false): File {
+        val dst = uniqueFile(ctx)
+        if (collect) {
+            val target = File(collectDir(ctx), dst.name)
+            store(src, target, keepOriginal)
+            return target
+        }
+        store(src, dst, keepOriginal)
+        return dst
+    }
+
+    private fun store(src: File, dst: File, keepOriginal: Boolean) {
         if (keepOriginal || !shrink(src, dst)) {
             if (!src.renameTo(dst)) {
                 src.copyTo(dst, overwrite = true)
@@ -45,15 +91,15 @@ object PhotoStore {
         } else {
             src.delete()
         }
-        return dst
     }
 
-    private fun uniqueQueueFile(ctx: Context): File {
+    private fun uniqueFile(ctx: Context): File {
         val stamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(Date())
-        var f = File(queueDir(ctx), "Foto_$stamp.jpg")
+        fun taken(n: String) = File(queueDir(ctx), n).exists() || File(collectDir(ctx), n).exists()
+        var name = "Foto_$stamp.jpg"
         var i = 2
-        while (f.exists()) f = File(queueDir(ctx), "Foto_${stamp}_${i++}.jpg")
-        return f
+        while (taken(name)) name = "Foto_${stamp}_${i++}.jpg"
+        return File(queueDir(ctx), name)
     }
 
     /** Verkleint naar max. [MAX_SIDE] px en draait volgens EXIF. Geeft false bij mislukken. */

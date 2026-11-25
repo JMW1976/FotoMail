@@ -54,16 +54,26 @@ class SendJobService : JobService() {
                 return true
             }
             val time = SimpleDateFormat("HH:mm", Locale.getDefault())
-            for (file in PhotoStore.queued(ctx)) {
-                val pretty = file.nameWithoutExtension.removePrefix("Foto_").replace('_', ' ')
+            val batches = PhotoStore.batches(PhotoStore.queued(ctx))
+            fun pretty(f: java.io.File) = f.nameWithoutExtension.removePrefix("Foto_").replace('_', ' ')
+            var sentPhotos = 0
+            batches.forEachIndexed { i, batch ->
+                val first = pretty(batch.first())
+                val part = if (batches.size > 1) " – deel ${i + 1}/${batches.size}" else ""
+                val subject = if (batch.size == 1) "${s.subjectPrefix} $first$part"
+                              else "${s.subjectPrefix} $first (${batch.size} foto's)$part"
+                val mb = "%.1f".format(Locale.US, batch.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0)
+                val body = buildString {
+                    append(if (batch.size == 1) "Foto gemaakt op $first." else "${batch.size} foto's:\n")
+                    if (batch.size > 1) batch.forEach { append("• ${pretty(it)}\n") }
+                    append("\nOngeveer $mb MB, verstuurd met Foto to Mail.")
+                }
                 try {
-                    Mailer.send(
-                        s, file,
-                        subject = "${s.subjectPrefix} $pretty".trim(),
-                        body = "Foto gemaakt op $pretty, verstuurd met Foto to Mail."
-                    )
-                    file.delete()
-                    s.lastStatus = "✅ ${file.name} verstuurd om ${time.format(Date())}"
+                    Mailer.send(s, batch, subject.trim(), body)
+                    batch.forEach { it.delete() }
+                    sentPhotos += batch.size
+                    s.lastStatus = "✅ $sentPhotos foto${if (sentPhotos == 1) "" else "'s"} verstuurd " +
+                        "in ${i + 1} mail${if (i == 0) "" else "s"} om ${time.format(Date())}"
                 } catch (e: AuthenticationFailedException) {
                     s.lastStatus = "❌ Inloggen bij Gmail mislukt — controleer adres en app-wachtwoord."
                     return false
