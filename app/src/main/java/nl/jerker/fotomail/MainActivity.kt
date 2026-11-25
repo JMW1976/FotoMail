@@ -77,6 +77,12 @@ class MainActivity : Activity() {
         }
         col.addRow(brandIconButton(R.drawable.ic_camera_line, 112, "Foto maken") { startSeries() },
             height = dp(170), top = 24)
+        sendCollectedBtn = col.addRow(brandButton("Verstuur", ButtonStyle.BROWN, size = 18f) {
+            val n = PhotoStore.releaseCollected(applicationContext)
+            SendJobService.schedule(applicationContext)
+            toast("$n foto${if (n == 1) "" else "'s"} worden verstuurd")
+            refresh()
+        }, height = dp(72), top = 16) as Button
         status = StatusPanel(this).apply {
             addRow("subject", "Onderwerp")
             addRow("collected", "Verzameld")
@@ -103,7 +109,14 @@ class MainActivity : Activity() {
             addView(page)
         })
 
-        if (savedInstanceState == null) {
+        val crash = CrashLog.takeLast(this)
+        if (crash != null) {
+            AlertDialog.Builder(this, R.style.AppDialog)
+                .setTitle("De app is vorige keer vastgelopen")
+                .setMessage("Maak een screenshot van deze melding voor de ontwikkelaar:\n\n$crash")
+                .setPositiveButton("OK", null)
+                .show()
+        } else if (savedInstanceState == null) {
             if (!settings.isConfigured) openSettings()
             else if (settings.autoCamera) startSeries()
         }
