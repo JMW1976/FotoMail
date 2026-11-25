@@ -1,4 +1,4 @@
-# Foto Mail
+# Foto to Mail
 
 Android-app: foto maken → wordt automatisch als bijlage gemaild naar **j.wouters@allbrass.com**, verstuurd via **jerker.wouters@gmail.com** (Gmail-SMTP).
 

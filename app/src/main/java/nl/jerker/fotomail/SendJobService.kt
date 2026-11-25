@@ -60,7 +60,7 @@ class SendJobService : JobService() {
                     Mailer.send(
                         s, file,
                         subject = "${s.subjectPrefix} $pretty".trim(),
-                        body = "Foto gemaakt op $pretty, verstuurd met Foto Mail."
+                        body = "Foto gemaakt op $pretty, verstuurd met Foto to Mail."
                     )
                     file.delete()
                     s.lastStatus = "✅ ${file.name} verstuurd om ${time.format(Date())}"

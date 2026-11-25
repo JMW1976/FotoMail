@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -41,40 +42,29 @@ class MainActivity : Activity() {
 
         actionBar?.hide()
 
-        // Kopbalk: zwart, gele accentbalk, witte titel, gele ondertitel
+        // Kopbalk: alleen het Allbrass-logo op zwart
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setBackgroundColor(Brand.HEADER)
             setPadding(dp(24), dp(20), dp(24), dp(20))
         }
-        header.addView(View(this).apply { setBackgroundColor(Brand.YELLOW) },
-            LinearLayout.LayoutParams(dp(10), dp(56)))
-        val titles = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(16), 0, 0, 0)
-        }
-        titles.addView(TextView(this).apply {
-            text = "Foto Mail"
-            textSize = 30f
-            typeface = Brand.BOLD
-            setTextColor(Color.WHITE)
-        })
-        subtitle = TextView(this).apply {
-            textSize = 12f
-            typeface = Brand.BOLD
-            letterSpacing = 0.04f
-            setTextColor(Brand.YELLOW)
-        }
-        titles.addView(subtitle)
-        header.addView(titles)
+        header.addView(ImageView(this).apply {
+            setImageResource(R.drawable.allbrass_logo)
+            adjustViewBounds = true
+            scaleType = ImageView.ScaleType.FIT_START
+            contentDescription = "Allbrass"
+        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(64)))
+
+        subtitle = sectionLabel("")
 
         val col = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(24), dp(8), dp(24), dp(32))
         }
+        col.addRow(subtitle, top = 20)
         col.addRow(brandButton("📷  Foto maken", ButtonStyle.PRIMARY, size = 26f) { launchCamera() },
-            height = dp(170), top = 24)
+            height = dp(170), top = 10)
         status = TextView(this).apply {
             textSize = 16f
             setTextColor(Color.WHITE)

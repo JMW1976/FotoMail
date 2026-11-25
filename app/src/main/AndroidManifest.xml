@@ -16,7 +16,7 @@
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="Foto Mail"
+        android:label="Foto to Mail"
         android:theme="@style/AppTheme">
 
         <activity

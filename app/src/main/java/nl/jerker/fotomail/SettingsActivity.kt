@@ -108,7 +108,7 @@ class SettingsActivity : Activity() {
         testBtn.text = "Bezig met versturen…"
         Thread {
             val result = try {
-                Mailer.send(s, null, "Foto Mail – testbericht", "Het werkt! Foto's worden voortaan naar dit adres gestuurd.")
+                Mailer.send(s, null, "Foto to Mail – testbericht", "Het werkt! Foto's worden voortaan naar dit adres gestuurd.")
                 "✅ Testmail verstuurd naar ${s.recipient}"
             } catch (e: javax.mail.AuthenticationFailedException) {
                 "❌ Inloggen mislukt — controleer Gmail-adres en app-wachtwoord"

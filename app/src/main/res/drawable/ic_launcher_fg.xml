@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Geel, hoekig fototoestel op zwart -->
+<!-- Foto to Mail: geel fototoestel met witte envelop, op zwart -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <path android:fillColor="#FCDD17" android:pathData="M28,37 h9 l3,-5 h12 l3,5 h9 v26 h-36 z" />
+    <path android:fillColor="#111111" android:pathData="M46,41 a9,9 0 1 0 0.01,0 z" />
+    <path android:fillColor="#FCDD17" android:pathData="M46,45 a5,5 0 1 0 0.01,0 z" />
+    <path android:fillColor="#111111" android:pathData="M51,53 h31 v24 h-31 z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M54,56 h25 v18 h-25 z" />
     <path
-        android:fillColor="#FCDD17"
-        android:pathData="M32,40 h12 l4,-6 h12 l4,6 h12 v34 h-44 z" />
-    <path
-        android:fillColor="#111111"
-        android:pathData="M54,46 a11,11 0 1 0 0.01,0 z" />
-    <path
-        android:fillColor="#FCDD17"
-        android:pathData="M54,51 a6,6 0 1 0 0.01,0 z" />
+        android:pathData="M54,56.5 L66.5,66 L79,56.5"
+        android:strokeColor="#111111"
+        android:strokeWidth="2.6"
+        android:strokeLineJoin="miter" />
 </vector>
