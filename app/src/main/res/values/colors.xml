@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="icon_bg">#1E6FD9</color>
+    <color name="brand_yellow">#FCDD17</color>
+    <color name="brand_black">#111111</color>
+    <color name="header_black">#000000</color>
+    <color name="brand_brown">#41320B</color>
+    <color name="brand_grey">#232323</color>
+    <color name="icon_bg">#111111</color>
 </resources>

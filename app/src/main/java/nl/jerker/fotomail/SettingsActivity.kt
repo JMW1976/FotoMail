@@ -2,6 +2,7 @@ package nl.jerker.fotomail
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
@@ -29,11 +30,12 @@ class SettingsActivity : Activity() {
 
         val col = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(16), dp(20), dp(32))
+            setPadding(dp(24), dp(24), dp(24), dp(32))
+            setBackgroundColor(Brand.GREY)
         }
-        fun label(t: String, top: Int = 16) = col.addRow(TextView(this).apply { text = t; textSize = 14f }, top = top)
+        fun label(t: String, top: Int = 16) = col.addRow(sectionLabel(t), top = top)
         fun field(value: String, type: Int) = col.addRow(EditText(this).apply {
-            setText(value); inputType = type; isSingleLine = true
+            setText(value); inputType = type; isSingleLine = true; setTextColor(Color.WHITE)
         }, top = 2) as EditText
 
         label("Je Gmail-adres (afzender)", top = 0)
@@ -42,15 +44,13 @@ class SettingsActivity : Activity() {
         password = field(s.appPassword, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
         col.addRow(TextView(this).apply {
             textSize = 13f
+            setTextColor(Brand.MUTED)
             text = "Gmail accepteert hier niet je gewone wachtwoord. Zet tweestapsverificatie aan, " +
                 "maak een app-wachtwoord aan en plak de 16 tekens hierboven. Het wordt alleen op deze telefoon bewaard."
         }, top = 4)
-        col.addRow(Button(this).apply {
-            text = "App-wachtwoord aanmaken (opent Google)"
-            setOnClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://myaccount.google.com/apppasswords")))
-            }
-        }, top = 4)
+        col.addRow(brandButton("App-wachtwoord aanmaken", ButtonStyle.BLACK, size = 14f) {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://myaccount.google.com/apppasswords")))
+        }, top = 8)
 
         label("Versturen naar")
         recipient = field(s.recipient, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
@@ -60,23 +60,21 @@ class SettingsActivity : Activity() {
         keepOriginal = col.addRow(CheckBox(this).apply {
             text = "Originele grootte versturen (anders verkleind tot 2560 px, sneller)"
             isChecked = s.keepOriginal
+            setTextColor(Color.WHITE)
         }, top = 16) as CheckBox
         autoCamera = col.addRow(CheckBox(this).apply {
             text = "Camera direct openen bij starten van de app"
             isChecked = s.autoCamera
+            setTextColor(Color.WHITE)
         }, top = 4) as CheckBox
 
-        col.addRow(Button(this).apply {
-            text = "Opslaan"
-            setOnClickListener { if (save()) finish() }
-        }, top = 24)
-        testBtn = col.addRow(Button(this).apply {
-            text = "Testmail versturen"
-            setOnClickListener { sendTest() }
-        }) as Button
+        col.addRow(brandButton("Opslaan", ButtonStyle.PRIMARY) { if (save()) finish() }, top = 28)
+        testBtn = col.addRow(brandButton("Testmail versturen", ButtonStyle.BROWN) { sendTest() }, top = 12) as Button
 
         setContentView(ScrollView(this).apply {
             fitsSystemWindows = true
+            isFillViewport = true
+            setBackgroundColor(Brand.GREY)
             addView(col)
         })
     }

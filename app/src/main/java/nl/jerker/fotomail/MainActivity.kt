@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -38,41 +39,65 @@ class MainActivity : Activity() {
         pendingName = savedInstanceState?.getString(KEY_PENDING)
         PhotoStore.cleanCaptures(this, pendingName)
 
+        actionBar?.hide()
+
+        // Kopbalk: zwart, gele accentbalk, witte titel, gele ondertitel
+        val header = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setBackgroundColor(Brand.HEADER)
+            setPadding(dp(24), dp(20), dp(24), dp(20))
+        }
+        header.addView(View(this).apply { setBackgroundColor(Brand.YELLOW) },
+            LinearLayout.LayoutParams(dp(10), dp(56)))
+        val titles = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(16), 0, 0, 0)
+        }
+        titles.addView(TextView(this).apply {
+            text = "Foto Mail"
+            textSize = 30f
+            typeface = Brand.BOLD
+            setTextColor(Color.WHITE)
+        })
+        subtitle = TextView(this).apply {
+            textSize = 12f
+            typeface = Brand.BOLD
+            letterSpacing = 0.04f
+            setTextColor(Brand.YELLOW)
+        }
+        titles.addView(subtitle)
+        header.addView(titles)
+
         val col = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(24), dp(24), dp(24), dp(24))
+            setPadding(dp(24), dp(8), dp(24), dp(32))
         }
-        col.addRow(TextView(this).apply {
-            text = "Foto Mail"
-            textSize = 28f
-            gravity = Gravity.CENTER
-        }, top = 0)
-        subtitle = col.addRow(TextView(this).apply {
-            textSize = 15f
-            gravity = Gravity.CENTER
-        }, top = 4) as TextView
-        col.addRow(Button(this).apply {
-            text = "📷  Foto maken"
-            textSize = 24f
-            setOnClickListener { launchCamera() }
-        }, height = dp(170), top = 32)
-        status = col.addRow(TextView(this).apply { textSize = 16f }, top = 24) as TextView
-        retryBtn = col.addRow(Button(this).apply {
-            text = "Wachtrij nu versturen"
-            setOnClickListener {
-                SendJobService.schedule(applicationContext)
-                toast("Verzenden gestart")
-            }
-        }) as Button
-        col.addRow(Button(this).apply {
-            text = "Instellingen"
-            setOnClickListener { openSettings() }
-        }, top = 24)
+        col.addRow(brandButton("📷  Foto maken", ButtonStyle.PRIMARY, size = 26f) { launchCamera() },
+            height = dp(170), top = 24)
+        status = TextView(this).apply {
+            textSize = 16f
+            setTextColor(Color.WHITE)
+            setLineSpacing(0f, 1.2f)
+        }
+        col.addRow(accentCard(status), top = 24)
+        retryBtn = col.addRow(brandButton("Wachtrij nu versturen", ButtonStyle.BROWN) {
+            SendJobService.schedule(applicationContext)
+            toast("Verzenden gestart")
+        }, top = 16) as Button
+        col.addRow(brandButton("Instellingen", ButtonStyle.BLACK) { openSettings() }, top = 16)
 
+        val page = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Brand.GREY)
+            addView(header)
+            addView(col)
+        }
         setContentView(ScrollView(this).apply {
             fitsSystemWindows = true
-            addView(col)
+            setBackgroundColor(Brand.HEADER)
+            isFillViewport = true
+            addView(page)
         })
 
         if (savedInstanceState == null) {
@@ -148,7 +173,7 @@ class MainActivity : Activity() {
 
     private fun refresh() {
         val n = PhotoStore.queued(this).size
-        subtitle.text = "Foto's gaan naar ${settings.recipient}"
+        subtitle.text = "FOTO'S NAAR ${settings.recipient.uppercase()}"
         status.text = buildString {
             if (!settings.isConfigured) append("⚠️ Vul eerst je Gmail-gegevens in bij Instellingen.\n\n")
             append(if (n == 0) "Wachtrij leeg — alles is verstuurd." else "In wachtrij: $n foto${if (n == 1) "" else "'s"}")

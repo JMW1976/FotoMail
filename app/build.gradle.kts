@@ -11,8 +11,8 @@ android {
         applicationId = "nl.jerker.fotomail"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
     }
 
     // Vaste sleutel, zodat elke nieuwe build als update over de vorige installeert
