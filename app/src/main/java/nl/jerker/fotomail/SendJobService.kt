@@ -50,10 +50,9 @@ class SendJobService : JobService() {
         fun sendAll(ctx: Context): Boolean = synchronized(lock) {
             val s = Settings(ctx)
             if (!s.isConfigured) {
-                s.setLast("config", "Gmail-gegevens ontbreken. Vul ze in bij Instellingen.")
+                s.setLastFailure("config")
                 return true
             }
-            val time = SimpleDateFormat("HH:mm", Locale.getDefault())
             fun pretty(f: java.io.File) = f.nameWithoutExtension.removePrefix("Foto_").replace('_', ' ')
             var sentPhotos = 0
             var sentMails = 0
@@ -62,33 +61,33 @@ class SendJobService : JobService() {
                 var counter = 0
                 batches.forEachIndexed { i, batch ->
                     val first = pretty(batch.first())
-                    val part = if (batches.size > 1) " – deel ${i + 1}/${batches.size}" else ""
-                    val count = if (batch.size == 1) "" else " (${batch.size} foto's)"
+                    val part = if (batches.size > 1) " " + ctx.getString(R.string.mail_part, i + 1, batches.size) else ""
+                    val count = if (batch.size == 1) "" else " " + ctx.quantity(R.plurals.mail_count, batch.size)
                     val mailSubject = if (subject.isNotBlank()) "$subject$count$part"
                                       else "${s.subjectPrefix} $first$count$part".trim()
                     val names = batch.map { f ->
                         counter++
                         if (base.isNotEmpty()) "${base}_%02d.jpg".format(counter) else f.name
                     }
-                    val mb = "%.1f".format(Locale.US, batch.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0)
+                    val mb = "%.1f".format(Locale.getDefault(), batch.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0)
                     val body = buildString {
-                        if (subject.isNotBlank()) append("Onderwerp: $subject\n\n")
-                        append(if (batch.size == 1) "Foto gemaakt op $first.\n" else "${batch.size} foto's:\n")
+                        if (subject.isNotBlank()) append(ctx.getString(R.string.mail_subject_label, subject)).append("\n\n")
+                        append(if (batch.size == 1) ctx.getString(R.string.mail_photo_taken, first)
+                               else ctx.quantity(R.plurals.mail_n_photos, batch.size)).append("\n")
                         if (batch.size > 1) batch.forEachIndexed { j, f -> append("• ${names[j]} — ${pretty(f)}\n") }
-                        append("\nOngeveer $mb MB, verstuurd met Photo to Mail.")
+                        append("\n").append(ctx.getString(R.string.mail_footer, mb))
                     }
                     try {
                         Mailer.send(s, batch, mailSubject, body, names)
                         batch.forEach { PhotoStore.remove(it) }
                         sentPhotos += batch.size
                         sentMails++
-                        s.setLast("ok", "$sentPhotos foto${if (sentPhotos == 1) "" else "'s"}  ·  " +
-                            "$sentMails mail${if (sentMails == 1) "" else "s"}  ·  ${time.format(Date())}")
+                        s.setLastOk(sentPhotos, sentMails)
                     } catch (e: AuthenticationFailedException) {
-                        s.setLast("auth", "Inloggen bij Gmail mislukt. Controleer adres en app-wachtwoord bij Instellingen.")
+                        s.setLastFailure("auth")
                         return false
                     } catch (e: Exception) {
-                        s.setLast("error", "Nieuwe poging volgt automatisch.\n${e.fullMessage()}")
+                        s.setLastFailure("error", e.fullMessage())
                         return false
                     }
                 }

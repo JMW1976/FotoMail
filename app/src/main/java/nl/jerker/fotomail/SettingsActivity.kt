@@ -2,7 +2,6 @@ package nl.jerker.fotomail
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
@@ -11,7 +10,6 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
-import android.widget.TextView
 
 class SettingsActivity : Activity() {
 
@@ -28,66 +26,65 @@ class SettingsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         s = Settings(this)
+        val pal = pal
 
+        // Liggend: iets meer zijmarge zodat de velden niet over de hele breedte lopen
+        val side = if (isLandscape()) 64 else 24
         val col = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(24), dp(24), dp(24), dp(32))
-            setBackgroundColor(Brand.GREY)
+            setPadding(dp(side), dp(24), dp(side), dp(32))
+            setBackgroundColor(pal.bg)
         }
-        fun label(t: String, top: Int = 16) = col.addRow(sectionLabel(t), top = top)
-        fun field(value: String, type: Int) = col.addRow(EditText(this).apply {
-            setText(value); inputType = type; isSingleLine = true; setTextColor(Color.WHITE)
+        fun label(id: Int, top: Int = 16) = col.addRow(sectionLabel(getString(id)), top = top)
+        // Vaste id's: Android bewaart zo de ingevulde tekst bij draaien van het scherm
+        fun field(viewId: Int, value: String, type: Int, hintId: Int?) = col.addRow(EditText(this).apply {
+            id = viewId
+            setText(value)
+            inputType = type
+            isSingleLine = true
+            setTextColor(pal.text)
+            setHintTextColor(pal.hint)
+            if (hintId != null) hint = getString(hintId)
         }, top = 2) as EditText
+        fun check(viewId: Int, textId: Int, value: Boolean, top: Int = 4) = col.addRow(CheckBox(this).apply {
+            id = viewId
+            text = getString(textId)
+            isChecked = value
+            setTextColor(pal.text)
+        }, top = top) as CheckBox
 
-        col.addRow(brandButton("Handleiding: Gmail instellen", ButtonStyle.BROWN, size = 14f) {
+        col.addRow(brandButton(getString(R.string.help_button), ButtonStyle.BROWN, size = 14f) {
             startActivity(Intent(this, HelpActivity::class.java))
         }, top = 0)
 
-        label("Je Gmail-adres (afzender)", top = 24)
-        sender = field(s.sender, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
-        sender.hint = "naam@gmail.com"
-        label("Gmail app-wachtwoord (16 tekens)")
-        password = field(s.appPassword, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
+        val email = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        label(R.string.lbl_sender, top = 24)
+        sender = field(R.id.field_sender, s.sender, email, R.string.hint_sender)
+        label(R.string.lbl_password)
+        password = field(R.id.field_password, s.appPassword,
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD, null)
         password.hint = "abcd efgh ijkl mnop"
-        col.addRow(TextView(this).apply {
-            textSize = 13f
-            setTextColor(Brand.MUTED)
-            text = "Gmail accepteert hier niet je gewone wachtwoord. Zet tweestapsverificatie aan, " +
-                "maak een app-wachtwoord aan en plak de 16 tekens hierboven. Het wordt alleen op deze telefoon bewaard."
-        }, top = 4)
-        col.addRow(brandButton("App-wachtwoord aanmaken", ButtonStyle.BLACK, size = 14f) {
+        col.addRow(bodyText(getString(R.string.password_note), size = 13f).apply { setTextColor(pal.muted) }, top = 4)
+        col.addRow(brandButton(getString(R.string.create_app_password), ButtonStyle.BLACK, size = 14f) {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://myaccount.google.com/apppasswords")))
         }, top = 8)
 
-        label("Versturen naar")
-        recipient = field(s.recipient, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS)
-        recipient.hint = "bijv. je werkmail"
-        label("Onderwerp begint met")
-        prefix = field(s.subjectPrefix, InputType.TYPE_CLASS_TEXT)
+        label(R.string.lbl_recipient)
+        recipient = field(R.id.field_recipient, s.recipient, email, R.string.hint_recipient)
+        label(R.string.lbl_prefix)
+        prefix = field(R.id.field_prefix, s.subjectPrefix, InputType.TYPE_CLASS_TEXT, null)
 
-        keepOriginal = col.addRow(CheckBox(this).apply {
-            text = "Originele grootte versturen (anders verkleind tot 2560 px, sneller)"
-            isChecked = s.keepOriginal
-            setTextColor(Color.WHITE)
-        }, top = 16) as CheckBox
-        autoCamera = col.addRow(CheckBox(this).apply {
-            text = "Camera direct openen bij starten van de app"
-            isChecked = s.autoCamera
-            setTextColor(Color.WHITE)
-        }, top = 4) as CheckBox
-        directSend = col.addRow(CheckBox(this).apply {
-            text = "Elke foto direct versturen (uit = foto's verzamelen en samen versturen, max. 15 MB per mail)"
-            isChecked = s.directSend
-            setTextColor(Color.WHITE)
-        }, top = 4) as CheckBox
+        keepOriginal = check(R.id.check_original, R.string.cb_original, s.keepOriginal, top = 16)
+        autoCamera = check(R.id.check_autocamera, R.string.cb_autocamera, s.autoCamera)
+        directSend = check(R.id.check_direct, R.string.cb_direct, s.directSend)
 
-        col.addRow(brandButton("Opslaan", ButtonStyle.PRIMARY) { if (save()) finish() }, top = 28)
-        testBtn = col.addRow(brandButton("Testmail versturen", ButtonStyle.BROWN) { sendTest() }, top = 12) as Button
+        col.addRow(brandButton(getString(R.string.save), ButtonStyle.PRIMARY) { if (save()) finish() }, top = 28)
+        testBtn = col.addRow(brandButton(getString(R.string.send_test), ButtonStyle.BROWN) { sendTest() }, top = 12) as Button
 
         setContentView(ScrollView(this).apply {
             fitsSystemWindows = true
             isFillViewport = true
-            setBackgroundColor(Brand.GREY)
+            setBackgroundColor(pal.bg)
             addView(col)
         })
     }
@@ -96,11 +93,11 @@ class SettingsActivity : Activity() {
         val from = sender.text.toString().trim()
         val to = recipient.text.toString().trim()
         if (!from.contains("@") || !to.contains("@")) {
-            toast("Vul geldige e-mailadressen in")
+            toast(getString(R.string.invalid_emails))
             return false
         }
         if (password.text.isBlank()) {
-            toast("Vul het app-wachtwoord in")
+            toast(getString(R.string.enter_password))
             return false
         }
         s.sender = from
@@ -112,27 +109,30 @@ class SettingsActivity : Activity() {
         s.directSend = directSend.isChecked
         // Staan er nog foto's te wachten, probeer ze dan nu te versturen
         if (PhotoStore.queued(this).isNotEmpty()) SendJobService.schedule(applicationContext)
-        toast("Opgeslagen")
+        toast(getString(R.string.saved))
         return true
     }
 
     private fun sendTest() {
         if (!save()) return
         testBtn.isEnabled = false
-        testBtn.text = "Bezig met versturen…"
+        testBtn.text = getString(R.string.sending_busy)
+        val app = applicationContext
         Thread {
             val result = try {
-                Mailer.send(s, emptyList(), "Photo to Mail – testbericht", "Het werkt! Foto's worden voortaan naar dit adres gestuurd.")
-                "✅ Testmail verstuurd naar ${s.recipient}"
+                Mailer.send(s, emptyList(), app.getString(R.string.test_subject), app.getString(R.string.test_body))
+                app.getString(R.string.test_ok, s.recipient)
             } catch (e: javax.mail.AuthenticationFailedException) {
-                "❌ Inloggen mislukt — controleer Gmail-adres en app-wachtwoord"
+                app.getString(R.string.test_auth)
             } catch (e: Exception) {
-                "❌ Mislukt: ${e.fullMessage()}"
+                app.getString(R.string.test_fail, e.fullMessage())
             }
             runOnUiThread {
-                testBtn.isEnabled = true
-                testBtn.text = "Testmail versturen"
-                toast(result)
+                if (!isDestroyed) {
+                    testBtn.isEnabled = true
+                    testBtn.text = getString(R.string.send_test)
+                }
+                app.toast(result)
             }
         }.start()
     }

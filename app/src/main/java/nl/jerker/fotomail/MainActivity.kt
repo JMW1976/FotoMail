@@ -5,23 +5,21 @@ import android.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.view.Gravity
+import android.text.format.DateFormat
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
-import android.widget.TextView
 import java.io.File
+import java.util.Date
 
 class MainActivity : Activity() {
 
@@ -30,6 +28,10 @@ class MainActivity : Activity() {
     private lateinit var retryBtn: Button
     private lateinit var sendCollectedBtn: Button
     private var pendingName: String? = null
+
+    // Onderwerp-venster: wordt bij draaien bewaard en opnieuw getoond
+    private var subjectDialog: AlertDialog? = null
+    private var subjectInput: EditText? = null
 
     private val handler = Handler(Looper.getMainLooper())
     private val ticker = object : Runnable {
@@ -44,63 +46,63 @@ class MainActivity : Activity() {
         settings = Settings(this)
         pendingName = savedInstanceState?.getString(KEY_PENDING)
         PhotoStore.cleanCaptures(this, pendingName)
-
         actionBar?.hide()
 
-        // Kopbalk: app-logo links, Allbrass-logo rechts, op zwart
-        val header = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setBackgroundColor(Brand.HEADER)
-            setPadding(dp(24), dp(20), dp(24), dp(20))
-        }
-        header.addView(ImageView(this).apply {
-            setImageResource(R.drawable.app_logo)
-            adjustViewBounds = true
-            scaleType = ImageView.ScaleType.FIT_CENTER
-            contentDescription = "Photo to Mail"
-        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(48)))
-        header.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
-        header.addView(ImageView(this).apply {
-            setImageResource(R.drawable.allbrass_logo)
-            adjustViewBounds = true
-            scaleType = ImageView.ScaleType.FIT_END
-            contentDescription = "Allbrass"
-        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(56)).apply {
-            leftMargin = dp(16)
-        })
+        val pal = pal
+        val landscape = isLandscape()
 
-
-        val col = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(24), dp(8), dp(24), dp(32))
-        }
-        col.addRow(brandIconButton(R.drawable.ic_camera_line, 112, "Foto maken") { startSeries() },
-            height = dp(170), top = 24)
-        sendCollectedBtn = col.addRow(brandButton("Verstuur", ButtonStyle.BROWN, size = 18f) {
+        // Bouwstenen
+        val cameraBtn = brandIconButton(R.drawable.ic_camera_line, 112, getString(R.string.take_photo)) { startSeries() }
+        sendCollectedBtn = brandButton("", ButtonStyle.BROWN, size = 18f) {
             val n = PhotoStore.releaseCollected(applicationContext)
             SendJobService.schedule(applicationContext)
-            toast("$n foto${if (n == 1) "" else "'s"} worden verstuurd")
+            toast(quantity(R.plurals.sending_n, n))
             refresh()
-        }, height = dp(72), top = 16) as Button
-        status = StatusPanel(this).apply {
-            addRow("subject", "Onderwerp")
-            addRow("collected", "Verzameld")
-            addRow("queue", "Wachtrij")
-            addRow("last", "Laatste verzending")
         }
-        col.addRow(status.view, top = 24)
-        retryBtn = col.addRow(brandButton("Wachtrij nu versturen", ButtonStyle.BROWN) {
+        status = StatusPanel(this).apply {
+            addRow("subject", getString(R.string.row_subject))
+            addRow("collected", getString(R.string.row_collected))
+            addRow("queue", getString(R.string.row_queue))
+            addRow("last", getString(R.string.row_last))
+            addRow("problem", getString(R.string.row_problem))
+        }
+        retryBtn = brandButton(getString(R.string.retry_now), ButtonStyle.BROWN) {
             SendJobService.schedule(applicationContext)
-            toast("Verzenden gestart")
-        }, top = 16) as Button
-        col.addRow(brandButton("Instellingen", ButtonStyle.BLACK) { openSettings() }, top = 16)
+            toast(getString(R.string.sending_started))
+        }
+        val settingsBtn = brandButton(getString(R.string.settings), ButtonStyle.BLACK) { openSettings() }
+
+        // Kolom met knoppen en status
+        val side = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        side.addRow(sendCollectedBtn, top = 0)
+        side.addRow(status.view, top = 16)
+        side.addRow(retryBtn, top = 16)
+        side.addRow(settingsBtn, top = 16)
+
+        val body: View = if (landscape) {
+            // Liggend: camera links, status en knoppen rechts
+            LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(dp(24), dp(16), dp(24), dp(24))
+                addView(cameraBtn, LinearLayout.LayoutParams(0, dp(220), 1f))
+                addView(side, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    leftMargin = dp(24)
+                })
+            }
+        } else {
+            LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(24), dp(24), dp(24), dp(32))
+                addRow(cameraBtn, height = dp(170), top = 0)
+                addRow(side, top = 16)
+            }
+        }
 
         val page = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Brand.GREY)
-            addView(header)
-            addView(col)
+            setBackgroundColor(pal.bg)
+            addView(brandHeader(compact = landscape))
+            addView(body)
         }
         setContentView(ScrollView(this).apply {
             fitsSystemWindows = true
@@ -110,15 +112,18 @@ class MainActivity : Activity() {
         })
 
         val crash = CrashLog.takeLast(this)
-        if (crash != null) {
-            AlertDialog.Builder(this, R.style.AppDialog)
-                .setTitle("De app is vorige keer vastgelopen")
-                .setMessage("Maak een screenshot van deze melding voor de ontwikkelaar:\n\n$crash")
-                .setPositiveButton("OK", null)
+        when {
+            crash != null -> AlertDialog.Builder(this, R.style.AppDialog)
+                .setTitle(R.string.crash_title)
+                .setMessage(getString(R.string.crash_msg, crash))
+                .setPositiveButton(R.string.ok, null)
                 .show()
-        } else if (savedInstanceState == null) {
-            if (!settings.isConfigured) startActivity(Intent(this, HelpActivity::class.java))
-            else if (settings.autoCamera) startSeries()
+            savedInstanceState?.getBoolean(KEY_DIALOG) == true ->
+                startSeries(savedInstanceState.getString(KEY_DIALOG_TEXT))
+            savedInstanceState == null -> {
+                if (!settings.isConfigured) startActivity(Intent(this, HelpActivity::class.java))
+                else if (settings.autoCamera) startSeries()
+            }
         }
     }
 
@@ -132,53 +137,65 @@ class MainActivity : Activity() {
         handler.removeCallbacks(ticker)
     }
 
+    override fun onDestroy() {
+        subjectDialog?.dismiss()
+        super.onDestroy()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_PENDING, pendingName)
+        if (subjectDialog?.isShowing == true) {
+            outState.putBoolean(KEY_DIALOG, true)
+            outState.putString(KEY_DIALOG_TEXT, subjectInput?.text?.toString())
+        }
     }
 
     private fun openSettings() = startActivity(Intent(this, SettingsActivity::class.java))
 
     /** Vraagt het onderwerp van de fotoreeks en start daarna de camera. */
-    private fun startSeries() {
+    private fun startSeries(prefill: String? = null) {
         if (!settings.isConfigured) {
-            toast("Stel eerst je Gmail-gegevens in")
+            toast(getString(R.string.setup_first))
             openSettings()
             return
         }
         val input = EditText(this).apply {
-            setText(settings.currentSubject)
-            hint = "Bijv. Pers 3 – matrijsschade"
+            setText(prefill ?: settings.currentSubject)
+            hint = getString(R.string.subject_hint)
             isSingleLine = true
             imeOptions = EditorInfo.IME_ACTION_GO
-            setTextColor(Color.WHITE)
-            selectAll()
+            setTextColor(pal.text)
+            setHintTextColor(pal.hint)
+            if (prefill == null) selectAll() else setSelection(text.length)
         }
         val box = FrameLayout(this).apply {
             setPadding(dp(24), dp(8), dp(24), 0)
             addView(input)
         }
         val dialog = AlertDialog.Builder(this, R.style.AppDialog)
-            .setTitle("Onderwerp fotoreeks")
-            .setMessage("Wordt het onderwerp van de mail. Leeg laten mag.")
+            .setTitle(R.string.subject_title)
+            .setMessage(R.string.subject_msg)
             .setView(box)
-            .setPositiveButton("Start") { _, _ ->
+            .setPositiveButton(R.string.start) { _, _ ->
                 settings.currentSubject = input.text.toString()
                 launchCamera()
             }
-            .setNegativeButton("Annuleren", null)
+            .setNegativeButton(R.string.cancel, null)
             .create()
         input.setOnEditorActionListener { _, _, _ ->
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); true
         }
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+        subjectDialog = dialog
+        subjectInput = input
         dialog.show()
         input.requestFocus()
     }
 
     private fun launchCamera() {
         if (!settings.isConfigured) {
-            toast("Stel eerst je Gmail-gegevens in")
+            toast(getString(R.string.setup_first))
             openSettings()
             return
         }
@@ -194,7 +211,7 @@ class MainActivity : Activity() {
             startActivityForResult(intent, REQ_CAMERA)
         } catch (e: ActivityNotFoundException) {
             pendingName = null
-            toast("Geen camera-app gevonden")
+            toast(getString(R.string.no_camera))
         }
     }
 
@@ -210,7 +227,7 @@ class MainActivity : Activity() {
             file.delete()
             return
         }
-        status.setHeadline("Foto verwerken…", StatusPanel.Dot.BUSY)
+        status.setHeadline(getString(R.string.processing), StatusPanel.Dot.BUSY)
         val keep = settings.keepOriginal
         val direct = settings.directSend
         val subject = settings.currentSubject
@@ -221,19 +238,19 @@ class MainActivity : Activity() {
                 if (direct) {
                     SendJobService.schedule(app)
                     runOnUiThread {
-                        toast("Foto wordt verstuurd — maak de volgende of ga terug om te stoppen")
+                        toast(getString(R.string.photo_sending_next))
                         refresh()
                     }
                 } else {
                     val n = PhotoStore.collected(app).size
                     runOnUiThread {
-                        toast("Foto $n verzameld — maak de volgende of ga terug om te versturen")
+                        toast(getString(R.string.photo_collected_next, n))
                         refresh()
                     }
                 }
                 runOnUiThread { launchCamera() } // reeks: direct door naar de volgende foto
             } catch (e: Exception) {
-                runOnUiThread { toast("Verwerken mislukt: ${e.message}") }
+                runOnUiThread { toast(getString(R.string.processing_failed, e.message ?: "")) }
             }
         }.start()
     }
@@ -243,35 +260,46 @@ class MainActivity : Activity() {
         val c = PhotoStore.collected(this)
         val cMb = c.sumOf { PhotoStore.mailSize(it) } / 1_000_000.0
         val mails = PhotoStore.batches(c).size
-        fun foto(k: Int) = "$k foto${if (k == 1) "" else "'s"}"
         val state = settings.lastState
         val failed = n > 0 && (state == "error" || state == "auth")
         when {
-            !settings.isConfigured -> status.setHeadline("Instellingen onvolledig", StatusPanel.Dot.ERROR)
-            failed -> status.setHeadline("Verzenden mislukt", StatusPanel.Dot.ERROR)
-            n > 0 -> status.setHeadline("Bezig met versturen", StatusPanel.Dot.BUSY)
-            c.isNotEmpty() -> status.setHeadline("${foto(c.size)} klaar om te versturen", StatusPanel.Dot.BUSY)
-            state == "ok" -> status.setHeadline("Alles verstuurd", StatusPanel.Dot.OK)
-            else -> status.setHeadline("Klaar voor gebruik", StatusPanel.Dot.IDLE)
+            !settings.isConfigured -> status.setHeadline(getString(R.string.st_incomplete), StatusPanel.Dot.ERROR)
+            failed -> status.setHeadline(getString(R.string.st_failed), StatusPanel.Dot.ERROR)
+            n > 0 -> status.setHeadline(getString(R.string.st_busy), StatusPanel.Dot.BUSY)
+            c.isNotEmpty() -> status.setHeadline(quantity(R.plurals.ready_n, c.size), StatusPanel.Dot.BUSY)
+            state == "ok" -> status.setHeadline(getString(R.string.st_all_sent), StatusPanel.Dot.OK)
+            else -> status.setHeadline(getString(R.string.st_idle), StatusPanel.Dot.IDLE)
         }
         status.setRow("subject", settings.currentSubject.ifBlank { null })
-        status.setRow("collected", if (c.isEmpty()) null
-            else "${foto(c.size)}  ·  ${"%.1f".format(cMb)} MB  ·  $mails mail${if (mails == 1) "" else "s"}")
-        status.setRow("queue", if (n == 0) null else "${foto(n)} nog te versturen")
-        val lastText = when (state) {
-            "ok" -> settings.lastDetail
-            "auth", "error", "config" -> if (failed || state == "config") settings.lastDetail else null
+        status.setRow("collected", if (c.isEmpty()) null else listOf(
+            quantity(R.plurals.photos_n, c.size), "%.1f MB".format(cMb), quantity(R.plurals.mails_n, mails)
+        ).joinToString("  ·  "))
+        status.setRow("queue", if (n == 0) null else quantity(R.plurals.queue_n, n))
+
+        // Laatste geslaagde verzending, met tijd in het 12/24-uursformaat van de telefoon
+        status.setRow("last", if (settings.lastPhotos == 0) null else listOf(
+            quantity(R.plurals.photos_n, settings.lastPhotos),
+            quantity(R.plurals.mails_n, settings.lastMails),
+            DateFormat.getTimeFormat(this).format(Date(settings.lastTime))
+        ).joinToString("  ·  "))
+
+        val problem = when {
+            !settings.isConfigured -> getString(R.string.err_config)
+            failed && state == "auth" -> getString(R.string.err_auth)
+            failed -> getString(R.string.err_retry) + "\n" + settings.lastError
             else -> null
         }
-        val lastColor = if (state == "ok") Color.WHITE else Color.rgb(240, 150, 135)
-        status.setRow("last", lastText, lastColor)
+        status.setRow("problem", problem, pal.error)
+
         retryBtn.visibility = if (n > 0) View.VISIBLE else View.GONE
         sendCollectedBtn.visibility = if (c.isNotEmpty()) View.VISIBLE else View.GONE
-        sendCollectedBtn.text = "Verstuur ${c.size} foto${if (c.size == 1) "" else "'s"}"
+        sendCollectedBtn.text = quantity(R.plurals.send_n, c.size)
     }
 
     companion object {
         private const val REQ_CAMERA = 1
         private const val KEY_PENDING = "pending"
+        private const val KEY_DIALOG = "subjectDialog"
+        private const val KEY_DIALOG_TEXT = "subjectDialogText"
     }
 }

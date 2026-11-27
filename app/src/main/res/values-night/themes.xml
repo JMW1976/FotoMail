@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Donker thema -->
+    <style name="AppTheme" parent="android:Theme.Material">
+        <item name="android:colorPrimary">@color/brand_black</item>
+        <item name="android:colorPrimaryDark">@color/header_black</item>
+        <item name="android:colorAccent">@color/brand_yellow</item>
+        <item name="android:colorControlActivated">@color/brand_yellow</item>
+        <item name="android:colorControlNormal">#8A8A8A</item>
+        <item name="android:windowBackground">@color/brand_grey</item>
+        <item name="android:statusBarColor">@color/header_black</item>
+        <item name="android:navigationBarColor">@color/header_black</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorHint">#8A8A8A</item>
+    </style>
+</resources>

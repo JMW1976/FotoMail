@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gegenereerd: niet met de hand aanpassen -->
+<resources>
+    <string name="app_name">Photo to Mail</string>
+    <string name="take_photo">Take photo</string>
+    <string name="row_subject">Subject</string>
+    <string name="row_collected">Collected</string>
+    <string name="row_queue">Queue</string>
+    <string name="row_last">Last sent</string>
+    <string name="row_problem">Problem</string>
+    <string name="retry_now">Send queue now</string>
+    <string name="sending_started">Sending started</string>
+    <string name="settings">Settings</string>
+    <string name="crash_title">The app crashed last time</string>
+    <string name="crash_msg">Please take a screenshot of this message for the developer:\n\n%s</string>
+    <string name="ok">OK</string>
+    <string name="setup_first">Set up your Gmail details first</string>
+    <string name="subject_title">Photo series subject</string>
+    <string name="subject_msg">Becomes the email subject. May be left empty.</string>
+    <string name="subject_hint">e.g. Press 3 – die damage</string>
+    <string name="start">Start</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_camera">No camera app found</string>
+    <string name="processing">Processing photo…</string>
+    <string name="photo_sending_next">Photo is being sent – take the next one or go back to stop</string>
+    <string name="photo_collected_next">Photo %d collected – take the next one or go back to send</string>
+    <string name="processing_failed">Processing failed: %s</string>
+    <string name="st_incomplete">Settings incomplete</string>
+    <string name="st_failed">Sending failed</string>
+    <string name="st_busy">Sending…</string>
+    <string name="st_all_sent">All sent</string>
+    <string name="st_idle">Ready</string>
+    <string name="err_auth">Gmail sign-in failed. Check the address and app password in Settings.</string>
+    <string name="err_retry">A new attempt will follow automatically.</string>
+    <string name="err_config">Gmail details are missing. Fill them in under Settings.</string>
+    <string name="help_button">Guide: set up Gmail</string>
+    <string name="lbl_sender">Your Gmail address (sender)</string>
+    <string name="hint_sender">name@gmail.com</string>
+    <string name="lbl_password">Gmail app password (16 characters)</string>
+    <string name="password_note">Gmail does not accept your normal password here. Turn on 2-Step Verification, create an app password and paste the 16 characters above. It is only stored on this phone.</string>
+    <string name="create_app_password">Create app password</string>
+    <string name="lbl_recipient">Send to</string>
+    <string name="hint_recipient">e.g. your work email</string>
+    <string name="lbl_prefix">Subject starts with</string>
+    <string name="default_prefix">Photo</string>
+    <string name="cb_original">Send original size (otherwise reduced to 2560 px, faster)</string>
+    <string name="cb_autocamera">Open the camera directly when the app starts</string>
+    <string name="cb_direct">Send each photo immediately (off = collect photos and send them together, max. 15 MB per email)</string>
+    <string name="save">Save</string>
+    <string name="send_test">Send test email</string>
+    <string name="sending_busy">Sending…</string>
+    <string name="invalid_emails">Enter valid email addresses</string>
+    <string name="enter_password">Enter the app password</string>
+    <string name="saved">Saved</string>
+    <string name="test_subject">Photo to Mail – test message</string>
+    <string name="test_body">It works! Photos will now be sent to this address.</string>
+    <string name="test_ok">Test email sent to %s</string>
+    <string name="test_auth">Sign-in failed – check Gmail address and app password</string>
+    <string name="test_fail">Failed: %s</string>
+    <string name="mail_subject_label">Subject: %s</string>
+    <string name="mail_photo_taken">Photo taken on %s.</string>
+    <string name="mail_footer">About %s MB, sent with Photo to Mail.</string>
+    <string name="mail_part">– part %1$d/%2$d</string>
+    <string name="help_title">Set up Gmail</string>
+    <string name="help_intro">Photo to Mail sends your photos through a Gmail account. You set this up once; allow about 5 minutes. Use a computer or this phone.</string>
+    <string name="step1_t">Gmail account</string>
+    <string name="step1_b">You need a Gmail address to send from. If you don\'t have one, create a free account at gmail.com.</string>
+    <string name="step2_t">Turn on 2-Step Verification</string>
+    <string name="step2_b">Go to myaccount.google.com → Security → 2-Step Verification and turn it on. Without this step you cannot create an app password.</string>
+    <string name="open_security">Open Google security</string>
+    <string name="step3_t">Create an app password</string>
+    <string name="step3_b">Go to myaccount.google.com/apppasswords. Enter \"Photo to Mail\" as the name and tap Create. You get a 16-letter code (e.g. abcd efgh ijkl mnop). Copy it right away: Google shows it only once.</string>
+    <string name="open_apppw">Open app passwords</string>
+    <string name="step4_t">Enter the details in the app</string>
+    <string name="step4_b">Open Settings and fill in:\n•  Your Gmail address (sender)\n•  The 16-letter app password (spaces are fine)\n•  Send to: the address the photos should go to, e.g. your work email\nThen tap Save.</string>
+    <string name="step5_t">Test</string>
+    <string name="step5_b">In Settings, tap Send test email. Check that the email arrives; also check the Spam or Junk folder.</string>
+    <string name="good_to_know">Good to know</string>
+    <string name="tips">•  Never use your normal Gmail password; it does not work here.\n•  The app password stays on this phone only.\n•  Lost your phone? Remove the app password at myaccount.google.com/apppasswords.\n•  Message \"Sign-in failed\"? Check the Gmail address and create a new app password if needed.\n•  Photos are reduced by default; emails are at most 15 MB.</string>
+    <string name="to_settings">Go to settings</string>
+    <plurals name="photos_n">
+        <item quantity="one">%d photo</item>
+        <item quantity="other">%d photos</item>
+    </plurals>
+    <plurals name="mails_n">
+        <item quantity="one">%d email</item>
+        <item quantity="other">%d emails</item>
+    </plurals>
+    <plurals name="send_n">
+        <item quantity="one">Send %d photo</item>
+        <item quantity="other">Send %d photos</item>
+    </plurals>
+    <plurals name="sending_n">
+        <item quantity="one">%d photo is being sent</item>
+        <item quantity="other">%d photos are being sent</item>
+    </plurals>
+    <plurals name="ready_n">
+        <item quantity="one">%d photo ready to send</item>
+        <item quantity="other">%d photos ready to send</item>
+    </plurals>
+    <plurals name="queue_n">
+        <item quantity="one">%d photo still to send</item>
+        <item quantity="other">%d photos still to send</item>
+    </plurals>
+    <plurals name="mail_count">
+        <item quantity="one">(%d photo)</item>
+        <item quantity="other">(%d photos)</item>
+    </plurals>
+    <plurals name="mail_n_photos">
+        <item quantity="one">%d photo:</item>
+        <item quantity="other">%d photos:</item>
+    </plurals>
+</resources>

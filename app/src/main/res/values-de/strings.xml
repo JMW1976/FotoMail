@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gegenereerd: niet met de hand aanpassen -->
+<resources>
+    <string name="take_photo">Foto aufnehmen</string>
+    <string name="row_subject">Betreff</string>
+    <string name="row_collected">Gesammelt</string>
+    <string name="row_queue">Warteschlange</string>
+    <string name="row_last">Zuletzt gesendet</string>
+    <string name="row_problem">Problem</string>
+    <string name="retry_now">Warteschlange jetzt senden</string>
+    <string name="sending_started">Senden gestartet</string>
+    <string name="settings">Einstellungen</string>
+    <string name="crash_title">Die App ist beim letzten Mal abgestürzt</string>
+    <string name="crash_msg">Bitte machen Sie einen Screenshot dieser Meldung für den Entwickler:\n\n%s</string>
+    <string name="ok">OK</string>
+    <string name="setup_first">Richten Sie zuerst Ihre Gmail-Daten ein</string>
+    <string name="subject_title">Betreff der Fotoserie</string>
+    <string name="subject_msg">Wird zum Betreff der E-Mail. Darf leer bleiben.</string>
+    <string name="subject_hint">z. B. Presse 3 – Gesenkschaden</string>
+    <string name="start">Start</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="no_camera">Keine Kamera-App gefunden</string>
+    <string name="processing">Foto wird verarbeitet…</string>
+    <string name="photo_sending_next">Foto wird gesendet – nächstes aufnehmen oder zurück zum Beenden</string>
+    <string name="photo_collected_next">Foto %d gesammelt – nächstes aufnehmen oder zurück zum Senden</string>
+    <string name="processing_failed">Verarbeitung fehlgeschlagen: %s</string>
+    <string name="st_incomplete">Einstellungen unvollständig</string>
+    <string name="st_failed">Senden fehlgeschlagen</string>
+    <string name="st_busy">Wird gesendet…</string>
+    <string name="st_all_sent">Alles gesendet</string>
+    <string name="st_idle">Bereit</string>
+    <string name="err_auth">Gmail-Anmeldung fehlgeschlagen. Prüfen Sie Adresse und App-Passwort in den Einstellungen.</string>
+    <string name="err_retry">Ein neuer Versuch erfolgt automatisch.</string>
+    <string name="err_config">Gmail-Daten fehlen. Bitte in den Einstellungen eintragen.</string>
+    <string name="help_button">Anleitung: Gmail einrichten</string>
+    <string name="lbl_sender">Ihre Gmail-Adresse (Absender)</string>
+    <string name="hint_sender">name@gmail.com</string>
+    <string name="lbl_password">Gmail-App-Passwort (16 Zeichen)</string>
+    <string name="password_note">Gmail akzeptiert hier nicht Ihr normales Passwort. Aktivieren Sie die Bestätigung in zwei Schritten, erstellen Sie ein App-Passwort und fügen Sie die 16 Zeichen oben ein. Es wird nur auf diesem Telefon gespeichert.</string>
+    <string name="create_app_password">App-Passwort erstellen</string>
+    <string name="lbl_recipient">Senden an</string>
+    <string name="hint_recipient">z. B. Ihre Arbeits-E-Mail</string>
+    <string name="lbl_prefix">Betreff beginnt mit</string>
+    <string name="default_prefix">Foto</string>
+    <string name="cb_original">Originalgröße senden (sonst auf 2560 px verkleinert, schneller)</string>
+    <string name="cb_autocamera">Kamera beim Start der App direkt öffnen</string>
+    <string name="cb_direct">Jedes Foto sofort senden (aus = Fotos sammeln und gemeinsam senden, max. 15 MB pro E-Mail)</string>
+    <string name="save">Speichern</string>
+    <string name="send_test">Test-E-Mail senden</string>
+    <string name="sending_busy">Wird gesendet…</string>
+    <string name="invalid_emails">Bitte gültige E-Mail-Adressen eingeben</string>
+    <string name="enter_password">Bitte das App-Passwort eingeben</string>
+    <string name="saved">Gespeichert</string>
+    <string name="test_subject">Photo to Mail – Testnachricht</string>
+    <string name="test_body">Es funktioniert! Fotos werden ab jetzt an diese Adresse gesendet.</string>
+    <string name="test_ok">Test-E-Mail an %s gesendet</string>
+    <string name="test_auth">Anmeldung fehlgeschlagen – Gmail-Adresse und App-Passwort prüfen</string>
+    <string name="test_fail">Fehlgeschlagen: %s</string>
+    <string name="mail_subject_label">Betreff: %s</string>
+    <string name="mail_photo_taken">Foto aufgenommen am %s.</string>
+    <string name="mail_footer">Ca. %s MB, gesendet mit Photo to Mail.</string>
+    <string name="mail_part">– Teil %1$d/%2$d</string>
+    <string name="help_title">Gmail einrichten</string>
+    <string name="help_intro">Photo to Mail sendet Ihre Fotos über ein Gmail-Konto. Das richten Sie einmalig ein; rechnen Sie mit etwa 5 Minuten. Verwenden Sie dafür einen Computer oder dieses Telefon.</string>
+    <string name="step1_t">Gmail-Konto</string>
+    <string name="step1_b">Sie benötigen eine Gmail-Adresse als Absender. Falls Sie noch keine haben, erstellen Sie kostenlos ein Konto auf gmail.com.</string>
+    <string name="step2_t">Bestätigung in zwei Schritten aktivieren</string>
+    <string name="step2_b">Gehen Sie zu myaccount.google.com → Sicherheit → Bestätigung in zwei Schritten und aktivieren Sie sie. Ohne diesen Schritt können Sie kein App-Passwort erstellen.</string>
+    <string name="open_security">Google-Sicherheit öffnen</string>
+    <string name="step3_t">App-Passwort erstellen</string>
+    <string name="step3_b">Gehen Sie zu myaccount.google.com/apppasswords. Geben Sie als Namen „Photo to Mail“ ein und tippen Sie auf Erstellen. Sie erhalten einen Code mit 16 Buchstaben (z. B. abcd efgh ijkl mnop). Kopieren Sie ihn sofort: Google zeigt ihn nur einmal an.</string>
+    <string name="open_apppw">App-Passwörter öffnen</string>
+    <string name="step4_t">Daten in der App eingeben</string>
+    <string name="step4_b">Öffnen Sie die Einstellungen und tragen Sie ein:\n•  Ihre Gmail-Adresse (Absender)\n•  Das App-Passwort mit 16 Buchstaben (Leerzeichen sind erlaubt)\n•  Senden an: die Adresse, an die die Fotos gehen sollen, z. B. Ihre Arbeits-E-Mail\nTippen Sie dann auf Speichern.</string>
+    <string name="step5_t">Testen</string>
+    <string name="step5_b">Tippen Sie in den Einstellungen auf Test-E-Mail senden. Prüfen Sie, ob die E-Mail ankommt; sehen Sie auch im Spam-Ordner nach.</string>
+    <string name="good_to_know">Gut zu wissen</string>
+    <string name="tips">•  Verwenden Sie nie Ihr normales Gmail-Passwort; es funktioniert hier nicht.\n•  Das App-Passwort bleibt nur auf diesem Telefon.\n•  Telefon verloren? Entfernen Sie das App-Passwort unter myaccount.google.com/apppasswords.\n•  Meldung „Anmeldung fehlgeschlagen“? Prüfen Sie die Gmail-Adresse und erstellen Sie bei Bedarf ein neues App-Passwort.\n•  Fotos werden standardmäßig verkleinert; E-Mails sind höchstens 15 MB groß.</string>
+    <string name="to_settings">Zu den Einstellungen</string>
+    <plurals name="photos_n">
+        <item quantity="one">%d Foto</item>
+        <item quantity="other">%d Fotos</item>
+    </plurals>
+    <plurals name="mails_n">
+        <item quantity="one">%d E-Mail</item>
+        <item quantity="other">%d E-Mails</item>
+    </plurals>
+    <plurals name="send_n">
+        <item quantity="one">%d Foto senden</item>
+        <item quantity="other">%d Fotos senden</item>
+    </plurals>
+    <plurals name="sending_n">
+        <item quantity="one">%d Foto wird gesendet</item>
+        <item quantity="other">%d Fotos werden gesendet</item>
+    </plurals>
+    <plurals name="ready_n">
+        <item quantity="one">%d Foto bereit zum Senden</item>
+        <item quantity="other">%d Fotos bereit zum Senden</item>
+    </plurals>
+    <plurals name="queue_n">
+        <item quantity="one">%d Foto noch zu senden</item>
+        <item quantity="other">%d Fotos noch zu senden</item>
+    </plurals>
+    <plurals name="mail_count">
+        <item quantity="one">(%d Foto)</item>
+        <item quantity="other">(%d Fotos)</item>
+    </plurals>
+    <plurals name="mail_n_photos">
+        <item quantity="one">%d Foto:</item>
+        <item quantity="other">%d Fotos:</item>
+    </plurals>
+</resources>

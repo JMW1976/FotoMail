@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gegenereerd: niet met de hand aanpassen -->
+<resources>
+    <string name="take_photo">Foto maken</string>
+    <string name="row_subject">Onderwerp</string>
+    <string name="row_collected">Verzameld</string>
+    <string name="row_queue">Wachtrij</string>
+    <string name="row_last">Laatste verzending</string>
+    <string name="row_problem">Probleem</string>
+    <string name="retry_now">Wachtrij nu versturen</string>
+    <string name="sending_started">Verzenden gestart</string>
+    <string name="settings">Instellingen</string>
+    <string name="crash_title">De app is vorige keer vastgelopen</string>
+    <string name="crash_msg">Maak een screenshot van deze melding voor de ontwikkelaar:\n\n%s</string>
+    <string name="ok">OK</string>
+    <string name="setup_first">Stel eerst je Gmail-gegevens in</string>
+    <string name="subject_title">Onderwerp fotoreeks</string>
+    <string name="subject_msg">Wordt het onderwerp van de mail. Leeg laten mag.</string>
+    <string name="subject_hint">Bijv. Pers 3 – matrijsschade</string>
+    <string name="start">Start</string>
+    <string name="cancel">Annuleren</string>
+    <string name="no_camera">Geen camera-app gevonden</string>
+    <string name="processing">Foto verwerken…</string>
+    <string name="photo_sending_next">Foto wordt verstuurd – maak de volgende of ga terug om te stoppen</string>
+    <string name="photo_collected_next">Foto %d verzameld – maak de volgende of ga terug om te versturen</string>
+    <string name="processing_failed">Verwerken mislukt: %s</string>
+    <string name="st_incomplete">Instellingen onvolledig</string>
+    <string name="st_failed">Verzenden mislukt</string>
+    <string name="st_busy">Bezig met versturen</string>
+    <string name="st_all_sent">Alles verstuurd</string>
+    <string name="st_idle">Klaar voor gebruik</string>
+    <string name="err_auth">Inloggen bij Gmail mislukt. Controleer adres en app-wachtwoord bij Instellingen.</string>
+    <string name="err_retry">Nieuwe poging volgt automatisch.</string>
+    <string name="err_config">Gmail-gegevens ontbreken. Vul ze in bij Instellingen.</string>
+    <string name="help_button">Handleiding: Gmail instellen</string>
+    <string name="lbl_sender">Je Gmail-adres (afzender)</string>
+    <string name="hint_sender">naam@gmail.com</string>
+    <string name="lbl_password">Gmail app-wachtwoord (16 tekens)</string>
+    <string name="password_note">Gmail accepteert hier niet je gewone wachtwoord. Zet tweestapsverificatie aan, maak een app-wachtwoord aan en plak de 16 tekens hierboven. Het wordt alleen op deze telefoon bewaard.</string>
+    <string name="create_app_password">App-wachtwoord aanmaken</string>
+    <string name="lbl_recipient">Versturen naar</string>
+    <string name="hint_recipient">bijv. je werkmail</string>
+    <string name="lbl_prefix">Onderwerp begint met</string>
+    <string name="default_prefix">Foto</string>
+    <string name="cb_original">Originele grootte versturen (anders verkleind tot 2560 px, sneller)</string>
+    <string name="cb_autocamera">Camera direct openen bij starten van de app</string>
+    <string name="cb_direct">Elke foto direct versturen (uit = foto\'s verzamelen en samen versturen, max. 15 MB per mail)</string>
+    <string name="save">Opslaan</string>
+    <string name="send_test">Testmail versturen</string>
+    <string name="sending_busy">Bezig met versturen…</string>
+    <string name="invalid_emails">Vul geldige e-mailadressen in</string>
+    <string name="enter_password">Vul het app-wachtwoord in</string>
+    <string name="saved">Opgeslagen</string>
+    <string name="test_subject">Photo to Mail – testbericht</string>
+    <string name="test_body">Het werkt! Foto\'s worden voortaan naar dit adres gestuurd.</string>
+    <string name="test_ok">Testmail verstuurd naar %s</string>
+    <string name="test_auth">Inloggen mislukt – controleer Gmail-adres en app-wachtwoord</string>
+    <string name="test_fail">Mislukt: %s</string>
+    <string name="mail_subject_label">Onderwerp: %s</string>
+    <string name="mail_photo_taken">Foto gemaakt op %s.</string>
+    <string name="mail_footer">Ongeveer %s MB, verstuurd met Photo to Mail.</string>
+    <string name="mail_part">– deel %1$d/%2$d</string>
+    <string name="help_title">Gmail instellen</string>
+    <string name="help_intro">Photo to Mail verstuurt je foto\'s via een Gmail-account. Dat stel je één keer in; reken op ongeveer 5 minuten. Gebruik hiervoor een computer of deze telefoon.</string>
+    <string name="step1_t">Gmail-account</string>
+    <string name="step1_b">Je hebt een Gmail-adres nodig om vanaf te versturen. Heb je er nog geen, maak dan gratis een account aan op gmail.com.</string>
+    <string name="step2_t">Verificatie in 2 stappen aanzetten</string>
+    <string name="step2_b">Ga naar myaccount.google.com → Beveiliging → Verificatie in 2 stappen en zet dit aan. Zonder deze stap kun je geen app-wachtwoord maken.</string>
+    <string name="open_security">Open Google-beveiliging</string>
+    <string name="step3_t">App-wachtwoord maken</string>
+    <string name="step3_b">Ga naar myaccount.google.com/apppasswords. Vul als naam \"Photo to Mail\" in en tik op Maken. Je krijgt een code van 16 letters (bijv. abcd efgh ijkl mnop). Kopieer deze meteen: Google laat hem maar één keer zien.</string>
+    <string name="open_apppw">Open app-wachtwoorden</string>
+    <string name="step4_t">Gegevens invullen in de app</string>
+    <string name="step4_b">Open Instellingen en vul in:\n•  Je Gmail-adres (afzender)\n•  Het app-wachtwoord van 16 letters (spaties mogen)\n•  Versturen naar: het adres waar de foto\'s heen moeten, bijv. je werkmail\nTik daarna op Opslaan.</string>
+    <string name="step5_t">Testen</string>
+    <string name="step5_b">Tik in Instellingen op Testmail versturen. Kijk of de mail aankomt; controleer ook de map Spam of Ongewenste e-mail.</string>
+    <string name="good_to_know">Goed om te weten</string>
+    <string name="tips">•  Gebruik nooit je gewone Gmail-wachtwoord; dat werkt hier niet.\n•  Het app-wachtwoord blijft alleen op deze telefoon.\n•  Telefoon kwijt? Verwijder het app-wachtwoord via myaccount.google.com/apppasswords.\n•  Melding \"Inloggen mislukt\"? Controleer het Gmail-adres en maak zo nodig een nieuw app-wachtwoord.\n•  Foto\'s worden standaard verkleind; mails zijn maximaal 15 MB.</string>
+    <string name="to_settings">Naar instellingen</string>
+    <plurals name="photos_n">
+        <item quantity="one">%d foto</item>
+        <item quantity="other">%d foto\'s</item>
+    </plurals>
+    <plurals name="mails_n">
+        <item quantity="one">%d mail</item>
+        <item quantity="other">%d mails</item>
+    </plurals>
+    <plurals name="send_n">
+        <item quantity="one">Verstuur %d foto</item>
+        <item quantity="other">Verstuur %d foto\'s</item>
+    </plurals>
+    <plurals name="sending_n">
+        <item quantity="one">%d foto wordt verstuurd</item>
+        <item quantity="other">%d foto\'s worden verstuurd</item>
+    </plurals>
+    <plurals name="ready_n">
+        <item quantity="one">%d foto klaar om te versturen</item>
+        <item quantity="other">%d foto\'s klaar om te versturen</item>
+    </plurals>
+    <plurals name="queue_n">
+        <item quantity="one">%d foto nog te versturen</item>
+        <item quantity="other">%d foto\'s nog te versturen</item>
+    </plurals>
+    <plurals name="mail_count">
+        <item quantity="one">(%d foto)</item>
+        <item quantity="other">(%d foto\'s)</item>
+    </plurals>
+    <plurals name="mail_n_photos">
+        <item quantity="one">%d foto:</item>
+        <item quantity="other">%d foto\'s:</item>
+    </plurals>
+</resources>

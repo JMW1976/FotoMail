@@ -4,7 +4,8 @@ import android.content.Context
 
 /** Eenvoudige opslag van de instellingen (blijft alleen op de telefoon). */
 class Settings(context: Context) {
-    private val p = context.applicationContext.getSharedPreferences("fotomail", Context.MODE_PRIVATE)
+    private val app = context.applicationContext
+    private val p = app.getSharedPreferences("fotomail", Context.MODE_PRIVATE)
 
     var sender: String
         get() = p.getString("sender", DEFAULT_SENDER) ?: DEFAULT_SENDER
@@ -20,7 +21,7 @@ class Settings(context: Context) {
         set(v) = p.edit().putString("recipient", v.trim()).apply()
 
     var subjectPrefix: String
-        get() = p.getString("subjectPrefix", "Foto") ?: "Foto"
+        get() = p.getString("subjectPrefix", null) ?: app.getString(R.string.default_prefix)
         set(v) = p.edit().putString("subjectPrefix", v.trim()).apply()
 
     /** false = foto verkleinen tot max. 2560 px (sneller versturen), true = origineel. */
@@ -48,12 +49,20 @@ class Settings(context: Context) {
         get() = p.getString("lastState", "") ?: ""
         set(v) = p.edit().putString("lastState", v).apply()
 
-    var lastDetail: String
-        get() = p.getString("lastDetail", "") ?: ""
-        set(v) = p.edit().putString("lastDetail", v).apply()
+    /** Details van de laatste geslaagde verzending (worden in de taal van de telefoon getoond). */
+    val lastPhotos: Int get() = p.getInt("lastPhotos", 0)
+    val lastMails: Int get() = p.getInt("lastMails", 0)
+    val lastTime: Long get() = p.getLong("lastTime", 0L)
+    /** Technische foutmelding van de laatste mislukte poging. */
+    val lastError: String get() = p.getString("lastError", "") ?: ""
 
-    fun setLast(state: String, detail: String) {
-        p.edit().putString("lastState", state).putString("lastDetail", detail).apply()
+    fun setLastOk(photos: Int, mails: Int) {
+        p.edit().putString("lastState", "ok").putInt("lastPhotos", photos).putInt("lastMails", mails)
+            .putLong("lastTime", System.currentTimeMillis()).apply()
+    }
+
+    fun setLastFailure(state: String, technical: String = "") {
+        p.edit().putString("lastState", state).putString("lastError", technical).apply()
     }
 
     val isConfigured: Boolean

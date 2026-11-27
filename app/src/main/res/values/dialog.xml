@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppDialog" parent="android:Theme.Material.Dialog.Alert">
-        <item name="android:colorAccent">@color/brand_yellow</item>
-        <item name="android:colorControlActivated">@color/brand_yellow</item>
-        <item name="android:windowBackground">@color/brand_black</item>
+    <style name="AppDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/brand_brown</item>
+        <item name="android:colorControlActivated">@color/brand_brown</item>
     </style>
 </resources>
